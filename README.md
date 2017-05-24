@@ -10,6 +10,8 @@ These instructions will allow you to run Slic3r from within AutoMaker.
 
 You must be using Mac OS X, have a copy of AutoMaker, and a copy of [Slic3r](https://github.com/prusa3d/Slic3r/releases).
 
+You must also note that __using this software may void your Robox warranty.__
+
 
 ### Installing
 
