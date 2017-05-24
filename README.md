@@ -17,7 +17,7 @@ You must be using Mac OS X, have a copy of AutoMaker, and a copy of [Slic3r](htt
 
 * Rename the CuraEngine within the Common/Cura directory to CuraEngine_exe
 ```
-mv /Applications/CEL/Common/Cura/CuraEngine to /Applications/CEL/Common/Cura/CuraEngine_exe
+mv /Applications/CEL/Common/Cura/CuraEngine /Applications/CEL/Common/Cura/CuraEngine_exe
 ```
 
 * Copy the files in shell scripts to /Applications/CEL/Common/Cura/
