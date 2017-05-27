@@ -25,11 +25,15 @@ while (<INPUT>) {
 
 seek INPUT, 0, 0;
 
-my $MIN_EXTRUSION_LENGTH = 4;
+my $MIN_EXTRUSION_LENGTH = 0.3;		# Minimum extrusion length before we will allow a retraction
+my $MIN_TRAVEL_DISTANCE = 0.01;  # Minimum distance of travel before we actually take the command seriously
 
 my $oldHint = '';
 my $hint = '';
+my $currentX = 0.00;
+my $currentY = 0.00;
 my $currentZ = 0.00;
+my $commandDistance = 0;
 my $outputZ = 0;
 my $layerChange = 0;
 my $currentSpeed = 0;
@@ -40,6 +44,14 @@ my $lastMoveWasRetract = 0;
 my $extrusionAfterRetraction = 0;
 
 while (<INPUT>) {
+
+	if (/(X([\-0-9\.]+)\s+Y([\-0-9\.]+))/){
+		my $newX = $2;
+		my $newY = $3;
+		
+		$commandDistance = sqrt((($newX - $currentX)**2) + (($newY - $currentY)**2));
+	}
+
 	if (/^(M204\s+S(\d+))/) {
 		printf NEW "M201 X%d Y%d Z%d E2000\n", $2, $2, $2;
 	} elsif (/^(M190\s)/) {
@@ -59,6 +71,7 @@ while (<INPUT>) {
 		$currentZ = $2;
 		$outputZ = 1;
 		$layerChange = 1;
+		$oldHint = "";
 	} elsif (/^(;LAYER:0)/) {
 		# Output the layer count
 		printf NEW ";Layer count: %d\n", $layerCount;
@@ -67,7 +80,7 @@ while (<INPUT>) {
 	} elsif (/^(;LAYER:)/) {
 		# Output the layer number
 		print NEW $_;
-		$extrusionAfterRetraction = 0;
+		#$extrusionAfterRetraction = 0;
 	} elsif (/^(G1\s+E([\-0-9\.]+)\s+F([0-9]+))/){
 		#retraction/unretraction
 		
@@ -82,13 +95,15 @@ while (<INPUT>) {
 		# Ensure that we leave enough room for slowly closing a nozzle before retracting
 		if($extrusionAfterRetraction > $MIN_EXTRUSION_LENGTH){
 			printf NEW "G1 F%s E%s\n", $feedrate, $extrusion;
-		}
-		$retractCount ++;
+
+			$retractCount ++;
 		
-		if($extrusion > 0){
-			$extrusionAfterRetraction = 0;
+			if($extrusion > 0){
+				$extrusionAfterRetraction = 0;
+			}
+			$lastMoveWasRetract = 2;
 		}
-		$lastMoveWasRetract = 2;
+
 	} elsif (/^(G1\s+F([\-0-9]+))/){
 		$currentSpeed = $2;
 	} elsif (/^(G1\s+X([\-0-9\.]+)\s+Y([\-0-9\.]+)\sF([0-9]+))/){
@@ -102,18 +117,38 @@ while (<INPUT>) {
 			$travelMoveLastFileSize = tell(NEW);
 		}
 		
-		if($outputZ == 1){
-			printf NEW "G0 F%s X%s Y%s Z%s\n", $4, $2, $3, $currentZ;
-			$outputZ = 0;
+		if($commandDistance < $MIN_TRAVEL_DISTANCE){
+			# Ignore, as this distance is too small for the postprocessor to handle
 		}
 		else {
-			printf NEW "G0 F%s X%s Y%s\n", $4, $2, $3;
-		}
-		$lastMoveWasTravel = 2;
 		
-		# Reset current extrusion length if we've just travelled, ignore if travel is part of retraction'
-		if($lastMoveWasRetract == 0){
-			$extrusionAfterRetraction = 0;
+			if(($lastMoveWasRetract == 0) && ($outputZ == 0)){
+				if($outputZ == 1){
+					printf NEW "G1 F%s X%s Y%s Z%s\n", $4, $2, $3, $currentZ;
+					$outputZ = 0;
+					$extrusionAfterRetraction = 0;
+				}
+				else {
+					printf NEW "G1 F%s X%s Y%s E0.00\n", $4, $2, $3;
+					$lastMoveWasTravel = 2;
+				}
+			}
+			else {
+
+				if($outputZ == 1){
+					printf NEW "G0 F%s X%s Y%s Z%s\n", $4, $2, $3, $currentZ;
+					$outputZ = 0;
+				}
+				else {
+					printf NEW "G0 F%s X%s Y%s\n", $4, $2, $3;
+				}
+				$lastMoveWasTravel = 2;
+		
+				# Reset current extrusion length if we've just travelled, ignore if travel is part of retraction'
+				if($lastMoveWasRetract == 0){
+					$extrusionAfterRetraction = 0;
+				}
+			}
 		}
 	} elsif (/^(G1\s+X([\-0-9\.]+)\s+Y([\-0-9\.]+)\s+E([\-0-9\.]+)\s+;\s+(\w+))/){
 		# Output hints as to what is going on
@@ -125,19 +160,31 @@ while (<INPUT>) {
 			print NEW ";TYPE:$hint\n";
 			$oldHint = $hint;
 		}
-		if($currentSpeed == 0){
-			printf NEW "G1 X%s Y%s E%s \n", $2, $3, $4;
+		
+		if(($2 == $currentX) && ($3 == $currentY)){
+			# Don't output zero distance moves
 		}
 		else {
-			printf NEW "G1 F%s X%s Y%s E%s \n", $currentSpeed, $2, $3, $4;
-			$currentSpeed = 0;
-		}
-		$extrusionAfterRetraction += $4;
 		
+			if($currentSpeed == 0){
+				printf NEW "G1 X%s Y%s E%s \n", $2, $3, $4;
+			}
+			else {
+				printf NEW "G1 F%s X%s Y%s E%s \n", $currentSpeed, $2, $3, $4;
+				$currentSpeed = 0;
+			}
+			$extrusionAfterRetraction += $4;
+		}		
 	} else {
 		print NEW $_;
 	}
 	
+	# Save the current position
+	if (/(X([\-0-9\.]+)\s+Y([\-0-9\.]+))/){
+		$currentX = $2;
+		$currentY = $3;
+	}
+
 	if($lastMoveWasTravel > 0){
 		$lastMoveWasTravel --;
 	}
