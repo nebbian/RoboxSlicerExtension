@@ -17,16 +17,25 @@
 */
 package com.roboxing.slicerextension.control;
 
-/**
- * Main class
- *
- */
-public class Main {
-    public static void main(String[] args) {
-        ControlWindow controlWindow = new ControlWindow();
+public class Slicer {
 
-        controlWindow.setLeaveAction(() -> System.exit(0));
+    private String label;
+    private boolean enabled;
 
-        controlWindow.setVisible(true);
+    protected Slicer() {
     }
+
+    public Slicer(String label, boolean enabled) {
+        this.label = label;
+        this.enabled = enabled;
+    }
+
+    protected void setLabel(String label) { this.label = label; }
+
+    public String getLabel() { return label; }
+
+    protected void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public boolean isEnabled() { return enabled; }
+
 }
