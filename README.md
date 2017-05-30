@@ -71,7 +71,7 @@ You can see the process here:
 
 ### Caveats
 
-This code should be considered pre-alpha, it hasn't been tested extensively.  Use at your own risk333.
+This code should be considered pre-alpha, it hasn't been tested extensively.  Use at your own risk.
 
 ### Known issues
 
@@ -81,6 +81,8 @@ This code should be considered pre-alpha, it hasn't been tested extensively.  Us
 ### Authors
 
 * **Ben Hitchcock** - *Initial work*
+* **Daniel Sendula** - *Installer functionality*
+
 
 ### License
 
