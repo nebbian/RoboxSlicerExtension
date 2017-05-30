@@ -1,0 +1,3 @@
+[submodule "installer/rbx-toolset"]
+	path = installer/rbx-toolset
+	url = git@github.com:natdan/rbx-toolset.git

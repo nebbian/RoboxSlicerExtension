@@ -36,7 +36,20 @@ You should now see that you have some new presets for Print Settings, Filament S
 
 * Close slic3r
 
-## Usage
+### Alternative Installation Method
+
+Download [robox-extensions-installer.jar](robox-extensions-installer.jar) and run it with
+```
+java -jar robox-extensions-installer.jar
+```
+and it will do steps from above for you:
+- copy CuraEngine to CuraEngine_orig (if not already exist)
+- download CuraEngine and slic3r_postprocess.pl to the right paths
+- and download Robox_slic3r_config_bundle.ini to <AM Install Dir>/Slic3r/Config for your convenience
+
+All you need to do is last step from previous chapter to select Slic3r's configuration.
+
+### Usage
 
 To use the new slicing engine, open AutoMaker, and load an STL to print.  
 
@@ -56,19 +69,19 @@ Automaker will now postprocess the code, and start the print.
 You can see the process here:
 [![Using Slic3r with Automaker](http://img.youtube.com/vi/5YmH0T2vJbY/0.jpg)](http://www.youtube.com/watch?v=5YmH0T2vJbY "Automaker with slic3r on a Robox Dual")
 
-## Caveats
+### Caveats
 
-This code should be considered pre-alpha, it hasn't been tested extensively.  Use at your own risk.
+This code should be considered pre-alpha, it hasn't been tested extensively.  Use at your own risk333.
 
-## Known issues
+### Known issues
 
 * The current version of Slic3r [has a bug when using multiple STL files](https://github.com/prusa3d/Slic3r/issues/313). 
 * The current version of Slic3r [crashes when enabling the layer editing function](https://github.com/prusa3d/Slic3r/issues/315)
 
-## Authors
+### Authors
 
 * **Ben Hitchcock** - *Initial work*
 
-## License
+### License
 
 This project is licensed under the GNU GPL v3.0 License - see the [LICENSE.txt](LICENSE.txt) file for details
