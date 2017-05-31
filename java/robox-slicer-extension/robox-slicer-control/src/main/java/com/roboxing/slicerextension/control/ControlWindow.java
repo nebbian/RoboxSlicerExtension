@@ -23,25 +23,31 @@ import static javax.swing.SpringLayout.SOUTH;
 import static javax.swing.SpringLayout.WEST;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Toolkit;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListCellRenderer;
 import javax.swing.SpringLayout;
 import javax.swing.UIManager;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
@@ -53,10 +59,16 @@ import javax.swing.text.Document;
 public class ControlWindow extends JFrame {
 
     private static final Slicer[] SLICERS = {
+            new Slicer("Default AM Cura", true),
             new Slicer("Slic3r", true),
             new Slicer("Simplify 3D", false),
             new Slicer("Cura 2.5", false),
             new Slicer("Cura 3.0", false)
+    };
+
+    private static final Script[] SCRIPTS = {
+            new Script("Internal"),
+            new Script("External")
     };
 
     private JPanel buttonsPanel;
@@ -68,6 +80,16 @@ public class ControlWindow extends JFrame {
     private JPanel mainPanel;
 
     private JComboBox<Slicer> slicersDropDown;
+    private JComboBox<Script> preProcessorScriptDropDown;
+    private JComboBox<Script> postProcessorScriptDropDown;
+
+    private JTextField preProcessorPath;
+    private JLabel preProcessorPathError;
+    private JButton preProcessorBrowseButton;
+
+    private JTextField postProcessorPath;
+    private JLabel postProcessorPathError;
+    private JButton postProcessorBrowseButton;
 
     private JTextArea logArea;
 
@@ -100,6 +122,11 @@ public class ControlWindow extends JFrame {
         });
     }
 
+
+    public void setSaveButtonEnable(boolean enable) {
+        saveButton.setEnabled(enable);
+    }
+
     private void createInformationPanel() {
         informationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
@@ -127,7 +154,7 @@ public class ControlWindow extends JFrame {
         SpringLayout layout = new SpringLayout();
 
         mainPanel.setLayout(layout);
-        JLabel amPathLabel = new JLabel("Select Slicer:");
+        JLabel selectSlicerLabel = new JLabel("Select Slicer:");
 
         slicersDropDown = new JComboBox<Slicer>(SLICERS) {
             @Override
@@ -139,30 +166,115 @@ public class ControlWindow extends JFrame {
             };
         };
         slicersDropDown.setSelectedIndex(0);
-        slicersDropDown.setRenderer(new CustomListCellRenderer());
+        slicersDropDown.setRenderer(new SlicerCellRenderer());
+
+        JLabel gcodePreProcessorLabel = new JLabel("GCode Pre Processor Script:");
+
+        preProcessorScriptDropDown = new JComboBox<Script>(SCRIPTS);
+        preProcessorScriptDropDown.setRenderer(new ScriptCellRenderer());
+        preProcessorScriptDropDown.setVisible(false);
+
+        preProcessorPath = new JTextField("");
+        preProcessorPathError = new JLabel("");
+        preProcessorPathError.setForeground(Color.RED);
+        preProcessorBrowseButton = new JButton("Browse...");
+
+        JLabel gcodePostProcessorLabel = new JLabel("GCode Post Processor Script:");
+
+        postProcessorScriptDropDown = new JComboBox<Script>(SCRIPTS);
+        postProcessorScriptDropDown.setRenderer(new ScriptCellRenderer());
+        postProcessorScriptDropDown.setVisible(false);
+
+        postProcessorPath = new JTextField("");
+        postProcessorPathError = new JLabel("");
+        postProcessorPathError.setForeground(Color.RED);
+        postProcessorBrowseButton = new JButton("Browse...");
+
+
+//        preProcessorPathError.setVisible(false);
+//        postProcessorPathError.setVisible(false);
+
 
         logArea = new JTextArea("");
-
         JScrollPane logAreaScroller = new JScrollPane();
         logAreaScroller.setViewportView(logArea);
         logAreaScroller.setBorder(BorderFactory.createTitledBorder("Output"));
 
-        mainPanel.add(amPathLabel);
+        mainPanel.add(selectSlicerLabel);
         mainPanel.add(slicersDropDown);
+        mainPanel.add(gcodePreProcessorLabel);
+        mainPanel.add(preProcessorScriptDropDown);
+        mainPanel.add(preProcessorPath);
+        mainPanel.add(preProcessorPathError);
+        mainPanel.add(preProcessorBrowseButton);
+        mainPanel.add(gcodePostProcessorLabel);
+        mainPanel.add(postProcessorScriptDropDown);
+        mainPanel.add(postProcessorPath);
+        mainPanel.add(postProcessorPathError);
+        mainPanel.add(postProcessorBrowseButton);
         mainPanel.add(logAreaScroller);
 
-        layout.putConstraint(NORTH, amPathLabel, 5, NORTH, mainPanel);
-        layout.putConstraint(WEST, amPathLabel, 5, WEST, mainPanel);
+        layout.putConstraint(NORTH, selectSlicerLabel, 5, NORTH, mainPanel);
+        layout.putConstraint(WEST, selectSlicerLabel, 5, WEST, mainPanel);
 
-        layout.putConstraint(WEST, slicersDropDown, 5, EAST, amPathLabel);
+        layout.putConstraint(NORTH, slicersDropDown, 5, NORTH, mainPanel);
+        layout.putConstraint(WEST, slicersDropDown, 5, EAST, selectSlicerLabel);
+
+        layout.putConstraint(SOUTH, selectSlicerLabel, 0, SOUTH, slicersDropDown);
 
 
-        layout.putConstraint(NORTH, logAreaScroller, 15, SOUTH, amPathLabel);
+        layout.putConstraint(NORTH, gcodePreProcessorLabel, 5, SOUTH, selectSlicerLabel);
+        layout.putConstraint(WEST, gcodePreProcessorLabel, 0, WEST, selectSlicerLabel);
+        layout.putConstraint(EAST, selectSlicerLabel, 0, EAST, gcodePreProcessorLabel);
+
+//        layout.putConstraint(NORTH, preProcessorScriptDropDown, 0, NORTH, gcodePreProcessorLabel);
+//        layout.putConstraint(WEST, preProcessorScriptDropDown, 5, EAST, gcodePreProcessorLabel);
+
+        layout.putConstraint(NORTH, preProcessorPath, 0, NORTH, gcodePreProcessorLabel);
+        layout.putConstraint(WEST, preProcessorPath, 5, EAST, gcodePreProcessorLabel);
+
+        layout.putConstraint(NORTH, preProcessorBrowseButton, 0, NORTH, preProcessorPath);
+        layout.putConstraint(EAST, preProcessorPath, 5, WEST, preProcessorBrowseButton);
+        layout.putConstraint(EAST, preProcessorBrowseButton, -5, EAST, mainPanel);
+
+        layout.putConstraint(SOUTH, preProcessorPath, 0, SOUTH, preProcessorBrowseButton);
+        layout.putConstraint(SOUTH, gcodePreProcessorLabel, 0, SOUTH, preProcessorBrowseButton);
+
+        layout.putConstraint(NORTH, preProcessorPathError, 5, SOUTH, gcodePreProcessorLabel);
+        layout.putConstraint(WEST, preProcessorPathError, 0, WEST, gcodePreProcessorLabel);
+        layout.putConstraint(EAST, preProcessorPathError, 0, EAST, mainPanel);
+
+
+        layout.putConstraint(NORTH, gcodePostProcessorLabel, 5, SOUTH, preProcessorPathError);
+        layout.putConstraint(WEST, gcodePostProcessorLabel, 0, WEST, gcodePreProcessorLabel);
+        layout.putConstraint(EAST, gcodePreProcessorLabel, 0, EAST, gcodePostProcessorLabel);
+
+//        layout.putConstraint(NORTH, postProcessorScriptDropDown, 0, NORTH, gcodePostProcessorLabel);
+//        layout.putConstraint(WEST, postProcessorScriptDropDown, 5, EAST, gcodePostProcessorLabel);
+
+        layout.putConstraint(NORTH, postProcessorPath, 5, NORTH, gcodePostProcessorLabel);
+        layout.putConstraint(WEST, postProcessorPath, 5, EAST, gcodePostProcessorLabel);
+
+        layout.putConstraint(NORTH, postProcessorBrowseButton, 5, NORTH, gcodePostProcessorLabel);
+        layout.putConstraint(EAST, postProcessorPath, 5, WEST, postProcessorBrowseButton);
+        layout.putConstraint(EAST, postProcessorBrowseButton, -5, EAST, mainPanel);
+
+        layout.putConstraint(SOUTH, postProcessorPath, 0, SOUTH, postProcessorBrowseButton);
+        layout.putConstraint(SOUTH, gcodePostProcessorLabel, 0, SOUTH, postProcessorBrowseButton);
+
+        layout.putConstraint(NORTH, postProcessorPathError, 5, SOUTH, gcodePostProcessorLabel);
+        layout.putConstraint(WEST, postProcessorPathError, 0, WEST, gcodePostProcessorLabel);
+        layout.putConstraint(EAST, postProcessorPathError, 0, EAST, mainPanel);
+
+
+        layout.putConstraint(NORTH, logAreaScroller, 15, SOUTH, postProcessorPathError);
         layout.putConstraint(WEST, logAreaScroller, 5, WEST, mainPanel);
         layout.putConstraint(EAST, logAreaScroller, -5, EAST, mainPanel);
         layout.putConstraint(SOUTH, logAreaScroller, -5, SOUTH, mainPanel);
 
         add(mainPanel, BorderLayout.CENTER);
+        preProcessorBrowseButton.addActionListener(e -> invokeFileSelector(preProcessorPath));
+        postProcessorBrowseButton.addActionListener(e -> invokeFileSelector(postProcessorPath));
     }
 
     public void log(String s) {
@@ -172,13 +284,50 @@ public class ControlWindow extends JFrame {
         } catch (BadLocationException ignore) { }
     }
 
-    private class CustomListCellRenderer extends JLabel implements ListCellRenderer<Slicer> {
-        public Component getListCellRendererComponent(
-                JList<? extends Slicer> list,
-                Slicer value,
-                int index,
-                boolean isSelected,
-                boolean cellHasFocus) {
+    public void setPreProcessorScriptPathError(String error) {
+        preProcessorPathError.setText(error);
+    }
+
+    public void setPreProcessorScriptPath(String path) {
+        preProcessorPath.setText(path);
+    }
+
+    public String getPreProcessorScriptPath() {
+        return preProcessorPath.getText();
+    }
+
+    public void setPreProcessorScriptPathChanged(PathChanged callback) {
+        setCallbackOnPath(preProcessorPath, callback);
+    }
+
+    public void setPostProcessorScriptPathError(String error) {
+        postProcessorPathError.setText(error);
+    }
+
+    public void setPostProcessorScriptPath(String path) {
+        postProcessorPath.setText(path);
+    }
+
+    public String getPostProcessorScriptPath() {
+        return postProcessorPath.getText();
+    }
+
+    public void setPostProcessorScriptPathChanged(PathChanged callback) {
+        setCallbackOnPath(postProcessorPath, callback);
+    }
+
+    private void setCallbackOnPath(JTextField field, PathChanged callback) {
+        field.getDocument().addDocumentListener(new DocumentListener() {
+            @Override public void changedUpdate(DocumentEvent e) { callback.changed(field.getText()); }
+            @Override public void removeUpdate(DocumentEvent e) { callback.changed(field.getText()); }
+            @Override public void insertUpdate(DocumentEvent e) { callback.changed(field.getText()); }
+        });
+    }
+
+    public interface PathChanged { void changed(String s); }
+
+    private class SlicerCellRenderer extends JLabel implements ListCellRenderer<Slicer> {
+        public Component getListCellRendererComponent(JList<? extends Slicer> list, Slicer value, int index, boolean isSelected, boolean cellHasFocus) {
 
             if (!value.isEnabled()) {
                 setBackground(UIManager.getColor("ComboBox.disabledBackground"));
@@ -194,6 +343,47 @@ public class ControlWindow extends JFrame {
             setText(value.getLabel());
 
             return this;
+        }
+    }
+
+    private class ScriptCellRenderer extends JLabel implements ListCellRenderer<Script> {
+        public Component getListCellRendererComponent(
+                JList<? extends Script> list, Script value, int index, boolean isSelected, boolean cellHasFocus) {
+
+            if (isSelected) {
+                setBackground(UIManager.getColor("ComboBox.selectionBackground"));
+                setForeground(UIManager.getColor("ComboBox.selectionForeground"));
+            } else {
+                setBackground(UIManager.getColor("ComboBox.background"));
+                setForeground(UIManager.getColor("ComboBox.foreground"));
+            }
+
+            setText(value.getLabel());
+
+            return this;
+        }
+    }
+
+
+    private void invokeFileSelector(JTextField path) {
+        File f = new File(path.getText());
+
+        while (f != null && f.toPath() != null && f.toPath().getNameCount() > 0 && !f.exists()) {
+            f = f.getParentFile();
+        }
+
+        JFileChooser fc = new JFileChooser();
+
+        if (f != null) {
+            fc.setSelectedFile(f);
+        }
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+
+        int res = fc.showOpenDialog(this);
+        if (res == JFileChooser.APPROVE_OPTION) {
+            File file = fc.getSelectedFile();
+
+            path.setText(file.getAbsolutePath());
         }
     }
 }
