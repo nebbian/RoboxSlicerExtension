@@ -42,6 +42,15 @@ my $travelMoveLastFileSize = 0;
 my $lastMoveWasTravel = 0;
 my $lastMoveWasRetract = 0;
 my $extrusionAfterRetraction = 0;
+my $retracted = 0;
+
+
+my $commandX = 'false';
+my $commandY = 'false';
+my $commandZ = 'false';
+my $commandE = 'false';
+my $commandSpeed = 'false';
+my $comment = 'false';
 
 while (<INPUT>) {
 
@@ -66,11 +75,43 @@ while (<INPUT>) {
 		# Remove use absolute coordinates
 	} elsif (/^(M83\s)/) {
 		# Remove use relative distances for extrusion
+	} elsif (/^(DISABLED_G1\s+)/){ 
+		EXIT_IF:{
+		
+			# Grab all possible commands
+			if(/(X([\-0-9\.]+)\s)/) {$commandX = $2} else {$commandX = 'false'}
+			if(/(Y([\-0-9\.]+)\s)/) {$commandY = $2} else {$commandY = 'false'}
+			if(/(Z([\-0-9\.]+)\s)/) {$commandZ = $2} else {$commandY = 'false'}
+			if(/(E([\-0-9\.]+)\s)/) {$commandE = $2} else {$commandE = 'false'}
+			if(/(F([\-0-9\.]+)\s)/) {$commandSpeed = $2} else {$commandSpeed = 'false'}
+			if(/;\s+(.+)$/) {$comment = $2} else {$comment = 'false'}
+		
+			# Output hints
+			if($comment eq "brim") { $hint = "SKIRT";}
+			if($comment eq "perimeter") { $hint = "WALL-OUTER"; }
+			if($comment eq "infill") { $hint = "SKIN"; }
+
+			if($hint ne $oldHint){
+				print NEW ";TYPE:$hint\n";
+				$oldHint = $hint;
+				last;	# Break out of the if statement
+			}
+		
+			if($commandSpeed != 'false'){
+			}
+		
+
+		}	
 	} elsif (/^(G1\s+Z([0-9\.]+)\s+)/){
 		# Layer change code
 		$currentZ = $2;
-		$outputZ = 1;
-		$layerChange = 1;
+		if($retracted == 1){
+			printf NEW "G0 X%s Y%s Z%s \n", $currentX, $currentY, $currentZ;
+		}
+		else {
+			$outputZ = 1;
+			$layerChange = 1;
+		}
 		$oldHint = "";
 	} elsif (/^(;LAYER:0)/) {
 		# Output the layer count
@@ -93,13 +134,17 @@ while (<INPUT>) {
 
 		# Ensure that we remove the first retract/unretract pair
 		# Ensure that we leave enough room for slowly closing a nozzle before retracting
-		if($extrusionAfterRetraction > $MIN_EXTRUSION_LENGTH){
+		if(($extrusionAfterRetraction > $MIN_EXTRUSION_LENGTH) || ($retracted == 1)){
 			printf NEW "G1 F%s E%s\n", $feedrate, $extrusion;
 
 			$retractCount ++;
 		
 			if($extrusion > 0){
 				$extrusionAfterRetraction = 0;
+				$retracted = 0;
+			}
+			else {
+				$retracted = 1;
 			}
 			$lastMoveWasRetract = 2;
 		}
@@ -122,14 +167,14 @@ while (<INPUT>) {
 		}
 		else {
 		
-			if(($lastMoveWasRetract == 0) && ($outputZ == 0)){
+			if(($retracted == 0) && ($outputZ == 0)){
 				if($outputZ == 1){
-					printf NEW "G1 F%s X%s Y%s Z%s\n", $4, $2, $3, $currentZ;
+					printf NEW "G0 F%s X%s Y%s Z%s\n", $4, $2, $3, $currentZ;
 					$outputZ = 0;
 					$extrusionAfterRetraction = 0;
 				}
 				else {
-					printf NEW "G1 F%s X%s Y%s E0.00\n", $4, $2, $3;
+					printf NEW "G0 F%s X%s Y%s E0.00\n", $4, $2, $3;
 					$lastMoveWasTravel = 2;
 				}
 			}
@@ -143,18 +188,15 @@ while (<INPUT>) {
 					printf NEW "G0 F%s X%s Y%s\n", $4, $2, $3;
 				}
 				$lastMoveWasTravel = 2;
-		
-				# Reset current extrusion length if we've just travelled, ignore if travel is part of retraction'
-				if($lastMoveWasRetract == 0){
-					$extrusionAfterRetraction = 0;
-				}
 			}
 		}
-	} elsif (/^(G1\s+X([\-0-9\.]+)\s+Y([\-0-9\.]+)\s+E([\-0-9\.]+)\s+;\s+(\w+))/){
+	} elsif (/^(G1\s+X([\-0-9\.]+)\s+Y([\-0-9\.]+)\s+E([\-0-9\.]+)\s+;\s+(.+))$/){
 		# Output hints as to what is going on
 		if($5 eq "brim") { $hint = "SKIRT";}
 		if($5 eq "perimeter") { $hint = "WALL-OUTER"; }
 		if($5 eq "infill") { $hint = "SKIN"; }
+		if($5 eq "support material") { $hint = "SUPPORT"; }
+		if($5 eq "support material interface") { $hint = "SUPPORT"; }
 
 		if($hint ne $oldHint){
 			print NEW ";TYPE:$hint\n";
