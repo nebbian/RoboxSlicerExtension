@@ -54,7 +54,7 @@ case $key in
     ;;
     -o|--output)
     	OUTPUTFILE="$2"
-      OUTPUTFILES="$OUTPUTFILES $2"
+    	OUTPUTFILES="$OUTPUTFILES $2"
     	shift # past argument
     ;;
     -v)
@@ -64,7 +64,7 @@ case $key in
     	# show progress - ignore argument
     ;;
     -c)
-      ROBOXPROFILE="$2"
+    	ROBOXPROFILE="$2"
     	# configuration file - ignore argument
     	shift #past argument
     ;;
@@ -86,9 +86,8 @@ then
   printf -v ARG_LIST '%q ' "--gui" "-o" "$OUTPUTFILE" "${INPUTFILES[@]}"
   eval "$SLICER $ARG_LIST"
   #exec $SLICER "--gui" "-o" "$OUTPUTFILE" ${INPUTFILES[@]}
-
   # Execute Cura slicer if we just want to print something
-#  exec $OPERATION $OPTIONS
+  #  exec $OPERATION $OPTIONS
 else
   # Use default slicer if we're just calculating times
   #exec $OPERATION $OPTIONS
