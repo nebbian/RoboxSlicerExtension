@@ -10,7 +10,7 @@ OPERATION=/Applications/CEL/Common/Cura/CuraEngine_exe
 #         Can be a complex chain of commands,
 #+        for example an awk script or a pipe . . .
 
-LOGFILE=/Users/ben/Desktop/CelRoboxlog.txt
+LOGFILE=/Users/$USER/Desktop/CelRoboxlog.log
 if [ -z "$LOGFILE" ]
 then     # If not set, default to ...
   LOGFILE="$DEFAULT_LOGFILE"
@@ -46,7 +46,7 @@ key="$1"
 case $key in
 	-h|--help)
 		usage
-		exit	
+		exit
 	;;
     -s|--slicer)
     	SLICER="$2"
@@ -54,6 +54,7 @@ case $key in
     ;;
     -o|--output)
     	OUTPUTFILE="$2"
+    	OUTPUTFILES="$OUTPUTFILES $2"
     	shift # past argument
     ;;
     -v)
@@ -63,6 +64,7 @@ case $key in
     	# show progress - ignore argument
     ;;
     -c)
+    	ROBOXPROFILE="$2"
     	# configuration file - ignore argument
     	shift #past argument
     ;;
@@ -81,12 +83,14 @@ regex='PrintJobs'
 if [[ "$PWD" =~ $regex ]]
 then
   # Execute our custom slicer if this is a print job
-  exec $SLICER "--gui" "-o" "$OUTPUTFILE" ${INPUTFILES[@]}
-
+  printf -v ARG_LIST '%q ' "--gui" "-o" "$OUTPUTFILE" "${INPUTFILES[@]}"
+  eval "$SLICER $ARG_LIST"
+  #exec $SLICER "--gui" "-o" "$OUTPUTFILE" ${INPUTFILES[@]}
   # Execute Cura slicer if we just want to print something
-#  exec $OPERATION $OPTIONS
+  #  exec $OPERATION $OPTIONS
 else
   # Use default slicer if we're just calculating times
-  exec $OPERATION $OPTIONS
+  #exec $OPERATION $OPTIONS
+  printf -v ARG_LIST '%q ' "-v" "-p" "-c" "$ROBOXPROFILE" "-o" "$OUTPUTFILE" "${INPUTFILES[@]}"
+  eval "$OPERATION $ARG_LIST"
 fi
-
