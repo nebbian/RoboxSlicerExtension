@@ -86,6 +86,7 @@ then
   printf -v ARG_LIST '%q ' "--gui" "-o" "$OUTPUTFILE" "${INPUTFILES[@]}"
   eval "$SLICER $ARG_LIST"
   #exec $SLICER "--gui" "-o" "$OUTPUTFILE" ${INPUTFILES[@]}
+  
   # Execute Cura slicer if we just want to print something
   #  exec $OPERATION $OPTIONS
 else
