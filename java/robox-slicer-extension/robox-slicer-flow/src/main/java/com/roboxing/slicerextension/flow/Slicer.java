@@ -17,29 +17,31 @@
 */
 package com.roboxing.slicerextension.flow;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.File;
+import java.io.IOException;
 
-/**
- * Main class of robox slicer extension
- *
- */
-public class Main {
-    public static void main(String[] args) {
+public abstract class Slicer {
 
-        Arguments arguments = new Arguments();
-        arguments.process(args);
+    private String name;
+    private Arguments args;
 
-        Path currentDir = Paths.get(".").toAbsolutePath().normalize();
-
-        Slicer slicer;
-        if (currentDir.toString().contains("PrintJobs")) {
-            slicer = new Slic3r();
-        } else {
-            slicer = new DefaultAMCura();
-        }
-        slicer.setArguments(arguments);
-        slicer.invoke();
-        slicer.postProcess();
+    protected Slicer(String name) {
+        this.name = name;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setArguments(Arguments args) {
+        this.args = args;
+    }
+
+    public Arguments getArguments() {
+        return args;
+    }
+
+    public abstract void postProcess(File in, File out) throws IOException;
+
+    public abstract void invoke() throws IOException;
 }
