@@ -41,7 +41,7 @@ public abstract class Slicer {
         return args;
     }
 
-    public abstract void postProcess(File in, File out) throws IOException;
+    public abstract void postProcess(File inputGCode, File resultGCode) throws IOException;
 
-    public abstract void invoke() throws IOException;
+    public abstract void invoke(File resultGCode) throws IOException, InterruptedException;
 }

@@ -1,5 +1,6 @@
 package com.roboxing.slicerextension.flow;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,15 +8,18 @@ public class Arguments {
 
     private String slicer;
 
-    private List<String> inputFiles = new ArrayList<>();
+    private String[] originalArguments;
 
-    private String outputFile;
+    private List<File> inputFiles = new ArrayList<>();
 
-    private List<String> outputFiles = new ArrayList<>();
+    private File outputFile;
+
+    private List<File> outputFiles = new ArrayList<>();
 
     private String roboxFile;
 
     public void process(String[] args) {
+        this.originalArguments = args;
         int i = 0;
         while (i < args.length) {
             String key = args[i];
@@ -23,8 +27,8 @@ public class Arguments {
             if (key.equals("-s")) {
                 slicer = key;
             } else if (key.equals("-o") || key.equals("--output")) {
-                outputFile = key;
-                outputFiles.add(key);
+                outputFile = new File(key);
+                outputFiles.add(outputFile);
             } else if (key.equals("-v")) {
                 // Verbose output - ignore parameter
             } else if (key.equals("-p")) {
@@ -37,26 +41,30 @@ public class Arguments {
                     i++;
                 }
             } else if (key.endsWith("stl") || key.endsWith("obj")) {
-                inputFiles.add(key);
+                inputFiles.add(new File(key));
             } else {
                 System.err.println("Unknown option '" + key + "'");
             }
         }
     }
 
+    public String[] getOriginalArguments() {
+        return originalArguments;
+    }
+
     public String getSlicer() {
         return slicer;
     }
 
-    public List<String> getInptFiles() {
+    public List<File> getInptFiles() {
         return inputFiles;
     }
 
-    public String getOutputFile() {
+    public File getOutputFile() {
         return outputFile;
     }
 
-    public List<String> getOutputFiles() {
+    public List<File> getOutputFiles() {
         return outputFiles;
     }
 

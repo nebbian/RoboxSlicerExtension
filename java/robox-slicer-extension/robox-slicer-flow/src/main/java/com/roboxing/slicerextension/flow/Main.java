@@ -17,9 +17,6 @@
 */
 package com.roboxing.slicerextension.flow;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
-
 /**
  * Main class of robox slicer extension
  *
@@ -30,16 +27,12 @@ public class Main {
         Arguments arguments = new Arguments();
         arguments.process(args);
 
-        Path currentDir = Paths.get(".").toAbsolutePath().normalize();
-
-        Slicer slicer;
-        if (currentDir.toString().contains("PrintJobs")) {
-            slicer = new Slic3r();
-        } else {
-            slicer = new DefaultAMCura();
+        Controller controller = new Controller(arguments);
+        try {
+            controller.process();
+        } catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
         }
-        slicer.setArguments(arguments);
-        slicer.invoke();
-        slicer.postProcess();
     }
 }
