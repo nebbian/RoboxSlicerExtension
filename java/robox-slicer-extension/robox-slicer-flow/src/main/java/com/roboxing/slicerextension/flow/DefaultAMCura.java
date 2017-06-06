@@ -16,4 +16,9 @@ public class DefaultAMCura extends Slicer {
         }
     }
 
+    @Override
+    public void invoke() throws IOException {
+
+    }
+
 }

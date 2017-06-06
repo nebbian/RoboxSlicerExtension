@@ -17,6 +17,8 @@
 */
 package com.roboxing.slicerextension.flow;
 
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -32,6 +34,10 @@ public class Main {
 
         Path currentDir = Paths.get(".").toAbsolutePath().normalize();
 
+
+        File input = new File(arguments.getOutputFile());
+        File output = new File(arguments.getOutputFile()+".orig");
+
         Slicer slicer;
         if (currentDir.toString().contains("PrintJobs")) {
             slicer = new Slic3r();
@@ -39,7 +45,15 @@ public class Main {
             slicer = new DefaultAMCura();
         }
         slicer.setArguments(arguments);
-        slicer.invoke();
-        slicer.postProcess();
+        try {
+            slicer.invoke();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            slicer.postProcess(input,output);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
