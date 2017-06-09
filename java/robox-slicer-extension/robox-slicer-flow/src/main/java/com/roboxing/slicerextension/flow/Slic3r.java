@@ -281,15 +281,17 @@ public class Slic3r extends Slicer {
                 lastMoveWasRetract--;
             }
 
-            if (!in.renameTo(out)) {
-                throw new IOException("Cannot rename '" + in.getPath() + "' to '" + out.getPath() + "'");
-            }
-            output.close();
-            File tmpOutput = new File(tmpFileName);
-            if (!tmpOutput.renameTo(in)) {
-                throw new IOException("Cannot rename '" + tmpOutput.getPath() + "' to '" + in.getPath() + "'");
-            }
 
+
+        }
+
+        if (!in.renameTo(out)) {
+            throw new IOException("Cannot rename '" + in.getPath() + "' to '" + out.getPath() + "'");
+        }
+        output.close();
+        File tmpOutput = new File(tmpFileName);
+        if (!tmpOutput.renameTo(in)) {
+            throw new IOException("Cannot rename '" + tmpOutput.getPath() + "' to '" + in.getPath() + "'");
         }
 
     }

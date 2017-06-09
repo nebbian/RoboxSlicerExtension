@@ -2,8 +2,12 @@ package com.roboxing.slicerextension.flow;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Arguments {
+
+    private static final Logger LOGGER = Logger.getLogger(Arguments.class.getName());
 
     private String slicer;
 
@@ -19,6 +23,7 @@ public class Arguments {
         int i = 0;
         while (i < args.length) {
             String key = args[i];
+            LOGGER.log(Level.FINE, "Argument : "+key);
             i++;
             if (key.equals("-s")) {
                 slicer = key;
