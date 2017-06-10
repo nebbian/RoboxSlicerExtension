@@ -51,6 +51,49 @@ public class Arguments {
                 System.err.println("Unknown option '" + key + "'");
             }
         }
+
+        ensureArgumentsValid();
+    }
+
+    private void ensureArgumentsValid() {
+        if (outputFile != null) {
+            // Debug mode - values if no input/output arguments set
+            String userCelRoboxPath = System.getProperty("user.home") + "/CEL Robox/";
+
+            File dir = new File(userCelRoboxPath + "PrintJobs");
+
+            // Set printJob as currentDir
+            System.setProperty("user.dir", dir.getAbsolutePath());
+            // Look inside first folder
+            for (File folder : dir.listFiles()) {
+                if (!folder.isDirectory()) {
+                    continue;
+                }
+
+                // Rename orig if there is already one
+                for (File file : folder.listFiles()) {
+                    System.out.println("File : " + file.getName());
+                    if (file.getName().endsWith(".orig")) {
+                        File gcodeFIle = new File(file.getAbsolutePath().replace(".orig", ""));
+                        gcodeFIle.delete();
+                        file.renameTo(new File(file.getAbsolutePath().replace(".orig","")));
+                        break;
+                    }
+                }
+                for (File file : folder.listFiles()) {
+                    System.out.println("File : " + file.getName());
+                    if (file.getName().endsWith(".gcode") && !file.getName().endsWith("_robox.gcode")) {
+                        //textFiles.add(file.getName());
+                        inputFiles.add(file);
+                        outputFile = new File(file.getAbsolutePath()+".orig");
+                        outputFiles.add(outputFile);
+                        break;
+                    }
+                }
+                //stop at first valid folder
+                break;
+            }
+        }
     }
 
     public String[] getOriginalArguments() {

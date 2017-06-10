@@ -26,10 +26,10 @@ public class Controller {
 
         slicer.setArguments(arguments);
 
-        File slicerGCode = new File(arguments.getOutputFile().getParentFile(), arguments.getOutputFile().getName() + ".slicer");
+        File slicerResultingGCode = new File(arguments.getOutputFile().getParentFile(), arguments.getOutputFile().getName() + ".slicer");
 
-        slicer.invoke(slicerGCode);
+        slicer.invoke(slicerResultingGCode);
 
-        slicer.postProcess(slicerGCode, arguments.getOutputFile());
+        slicer.postProcess(slicerResultingGCode, arguments.getOutputFile());
     }
 }
