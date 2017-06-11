@@ -20,13 +20,21 @@ package com.roboxing.slicerextension.flow;
 import java.io.File;
 import java.io.IOException;
 
+import org.json.JSONObject;
+
+/**
+ * This is base class for various slicers.
+ *
+ */
 public abstract class Slicer {
 
     private String name;
     private Arguments args;
+    private JSONObject slicerConfig;
 
-    protected Slicer(String name) {
+    protected Slicer(String name, JSONObject slicerConfig) {
         this.name = name;
+        this.slicerConfig = slicerConfig;
     }
 
     public String getName() {
@@ -39,6 +47,10 @@ public abstract class Slicer {
 
     public Arguments getArguments() {
         return args;
+    }
+
+    public JSONObject getSlicerConfig() {
+        return slicerConfig;
     }
 
     public abstract void postProcess(File inputGCode, File resultGCode) throws IOException;

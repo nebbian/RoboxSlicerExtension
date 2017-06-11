@@ -17,35 +17,31 @@
 */
 package com.roboxing.slicerextension.flow;
 
-import java.io.File;
-import java.io.IOException;
+import java.lang.reflect.Constructor;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.roboxing.slicerextension.flow.utils.JSONConfiguration;
-
 /**
- * Main class of robox slicer extension
+ * Convenient ENUM to slicer implementation class.
  *
  */
-public class Main {
-    public static void main(String[] args) throws JSONException, IOException {
+public enum Slicers {
+    DefaultAMCura,
+    Slic3r;
 
-        System.out.println(Main.class.getClassLoader().getResource("logging.properties"));
+    public static Slicer toSlicer(String selected, JSONObject slicerConfig) {
+        return toSlicer(Slicers.valueOf(selected), slicerConfig);
+    }
 
-        Arguments arguments = new Arguments();
-        arguments.process(args);
-
-        File configFile = new File(new File(OS.detect().getDefaultInstallationPath()), ".slicerextension.config");
-        JSONObject configuration = JSONConfiguration.readConfig(configFile);
-
-        Controller controller = new Controller(arguments, configuration);
+    public static Slicer toSlicer(Slicers selected, JSONObject slicerConfig) {
+        String className = Slicers.class.getPackage().getName() + "." + selected.name();
         try {
-            controller.process();
+            @SuppressWarnings("unchecked")
+            Class<Slicer> slicerClass = (Class<Slicer>)Class.forName(className);
+            Constructor<Slicer> constructor = slicerClass.getConstructor(JSONObject.class);
+            return constructor.newInstance(slicerConfig);
         } catch (Exception e) {
-            e.printStackTrace();
-            System.exit(1);
+            throw new RuntimeException(e);
         }
     }
 }
