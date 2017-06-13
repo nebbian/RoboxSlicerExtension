@@ -17,12 +17,44 @@
 */
 package com.roboxing.slicerextension.control;
 
+import java.io.File;
+
 /**
- * Hello world!
+ * Main class
  *
  */
 public class Main {
     public static void main(String[] args) {
-        System.out.println("Hello World!");
+        final ControlWindow controlWindow = new ControlWindow();
+
+        controlWindow.setLeaveAction(() -> System.exit(0));
+
+        controlWindow.setPreProcessorScriptPathChanged(path -> {
+            File file = new File(path).getAbsoluteFile();
+            if (!file.exists()) {
+                controlWindow.setPreProcessorScriptPathError("Path does not exist");
+            } else {
+                controlWindow.setPreProcessorScriptPathError("");
+            }
+            updateSaveButton(controlWindow);
+        });
+
+        controlWindow.setPostProcessorScriptPathChanged(path -> {
+            File file = new File(path).getAbsoluteFile();
+            if (!file.exists()) {
+                controlWindow.setPostProcessorScriptPathError("Path does not exist");
+            } else {
+                controlWindow.setPostProcessorScriptPathError("");
+            }
+            updateSaveButton(controlWindow);
+        });
+        controlWindow.setVisible(true);
     }
+
+    private static void updateSaveButton(ControlWindow controlWindow) {
+        File preProcessorScriptFile = new File(controlWindow.getPreProcessorScriptPath()).getAbsoluteFile();
+        File postProcessorScriptFile = new File(controlWindow.getPostProcessorScriptPath()).getAbsoluteFile();
+        controlWindow.setSaveButtonEnable(preProcessorScriptFile.exists() && postProcessorScriptFile.exists());
+    }
+
 }
