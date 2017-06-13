@@ -51,7 +51,6 @@ public class Controller {
 
     public void process() throws IOException, InterruptedException {
 
-
         Path currentDir = Paths.get(".").toAbsolutePath().normalize();
 
         String slicerName;

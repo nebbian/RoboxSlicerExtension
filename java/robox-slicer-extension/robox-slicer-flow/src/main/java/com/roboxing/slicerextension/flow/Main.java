@@ -37,7 +37,7 @@ public class Main {
         Arguments arguments = new Arguments();
         arguments.process(args);
 
-        File configFile = new File(new File(OS.detect().getDefaultInstallationPath()), ".slicerextension.config");
+        File configFile = new File(new File(OS.detect().getRoboxFolder()), ".slicerextension.config");
         JSONObject configuration = JSONConfiguration.readConfig(configFile);
 
         Controller controller = new Controller(arguments, configuration);

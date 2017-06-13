@@ -15,7 +15,7 @@
  * along with rbx-toolset.  If not, see <http://www.gnu.org/licenses/>.
  *
 */
-package com.roboxing.slicerextension.flow;
+package com.roboxing.slicerextension.control;
 
 import java.io.File;
 
@@ -25,23 +25,19 @@ import java.io.File;
 */
 public enum OS {
 
-    WINDOWS("Windows", "C:\\Program Files\\CEL", System.getProperty("user.home") + File.separator + "CEL Robox", "CuraEngine.exe", "CuraEngine_orig.exe"),
-    LINUX("Linux", "~", System.getProperty("user.home") + File.separator + "CEL Robox", "CuraEngine", "CuraEngine_exe"),
-    OSX("OSX", "/Applications/CEL", System.getProperty("user.home") + File.separator + "CEL Robox", "CuraEngine", "CuraEngine_exe"),
-    UNKNOWN("Unknown", "", "", "", "");
+    WINDOWS("Windows", "C:\\Program Files\\CEL", System.getProperty("user.home") + File.separator + "CEL Robox"),
+    LINUX("Linux", "~", System.getProperty("user.home") + File.separator + "CEL Robox"),
+    OSX("OSX", "/Applications/CEL", System.getProperty("user.home") + File.separator + "CEL Robox"),
+    UNKNOWN("Unknown", "", "");
 
     private String label;
     private String defaultInstallationPath;
     private String roboxFolder;
-    private String curaEnginePath;
-    private String curaEngineOrigPath;
 
-    OS(String label, String defaultInstallationPath, String roboxFolder, String curaEnginePath, String curaEngineOrigPath) {
+    OS(String label, String defaultInstallationPath, String roboxFolder) {
         this.label = label;
         this.defaultInstallationPath = defaultInstallationPath;
         this.roboxFolder = roboxFolder;
-        this.curaEnginePath = curaEnginePath;
-        this.curaEngineOrigPath = curaEngineOrigPath;
     }
 
     public String getLabel() { return label; }
@@ -49,10 +45,6 @@ public enum OS {
     public String getDefaultInstallationPath() { return defaultInstallationPath; }
 
     public String getRoboxFolder() { return roboxFolder; }
-
-    public String getCuraEnginePath() { return curaEnginePath; }
-
-    public String getCuraEngineOrigPath() { return curaEngineOrigPath; }
 
     public static OS detect() {
         String os = System.getProperty("os.name").toLowerCase();

@@ -18,6 +18,10 @@
 package com.roboxing.slicerextension.control;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+
+import org.json.JSONObject;
 
 /**
  * Main class
@@ -48,7 +52,28 @@ public class Main {
             }
             updateSaveButton(controlWindow);
         });
+
+        controlWindow.setSaveAction(() -> save(controlWindow));
         controlWindow.setVisible(true);
+    }
+
+    private static void save(ControlWindow controlWindow) {
+        Configuration configuration = Configuration.fromControlWindow(controlWindow);
+
+        File configFile = new File(new File(OS.detect().getRoboxFolder()), ".slicerextension.config");
+        JSONObject jsonConfig = new JSONObject(configuration);
+
+        String configContents = jsonConfig.toString(2);
+        System.out.println(configContents);
+
+        try (FileWriter writer = new FileWriter(configFile)) {
+            writer.write(configContents);
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+
+        System.exit(0);
     }
 
     private static void updateSaveButton(ControlWindow controlWindow) {

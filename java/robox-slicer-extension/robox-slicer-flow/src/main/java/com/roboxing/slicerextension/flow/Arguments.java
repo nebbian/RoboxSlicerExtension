@@ -49,8 +49,12 @@ public class Arguments {
             if (key.equals("-s")) {
                 slicer = key;
             } else if (key.equals("-o") || key.equals("--output")) {
-                outputFile = new File(key);
-                outputFiles.add(outputFile);
+                if (i < args.length) {
+                    key = args[i];
+                    i++;
+                    outputFile = new File(key);
+                    outputFiles.add(outputFile);
+                }
             } else if (key.equals("-v")) {
                 // Verbose output - ignore parameter
             } else if (key.equals("-p")) {
@@ -73,7 +77,7 @@ public class Arguments {
     }
 
     private void ensureArgumentsValid() {
-        if (outputFile != null) {
+        if (outputFile == null) {
             // Debug mode - values if no input/output arguments set
             String userCelRoboxPath = System.getProperty("user.home") + "/CEL Robox/";
 

@@ -21,18 +21,24 @@ public class Slicer {
 
     private String label;
     private boolean enabled;
+    private String configString;
 
     protected Slicer() {
     }
 
-    public Slicer(String label, boolean enabled) {
+    public Slicer(String label, String configString, boolean enabled) {
         this.label = label;
+        this.configString = configString;
         this.enabled = enabled;
     }
 
     protected void setLabel(String label) { this.label = label; }
 
     public String getLabel() { return label; }
+
+    protected void setConfigString(String configString) { this.configString = configString; }
+
+    public String getConfigString() { return configString; }
 
     protected void setEnabled(boolean enabled) { this.enabled = enabled; }
 

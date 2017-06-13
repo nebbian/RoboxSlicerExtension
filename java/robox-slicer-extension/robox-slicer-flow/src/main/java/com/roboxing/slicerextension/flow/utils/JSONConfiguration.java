@@ -40,14 +40,14 @@ public class JSONConfiguration {
    }
 
    public static Optional<JSONObject> getJSONObject(JSONObject config, String name) {
-       if (config.get(name) != null) {
+       if (config.opt(name) != null) {
            return Optional.of(config.getJSONObject(name));
        }
        return Optional.empty();
    }
 
    public static Optional<String> getConfString(JSONObject config, String name) {
-       if (config.get(name) != null) {
+       if (config.opt(name) != null) {
            return Optional.of(config.getString(name));
        }
        return Optional.empty();

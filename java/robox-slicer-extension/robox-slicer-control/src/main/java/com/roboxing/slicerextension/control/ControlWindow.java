@@ -59,11 +59,11 @@ import javax.swing.text.Document;
 public class ControlWindow extends JFrame {
 
     private static final Slicer[] SLICERS = {
-            new Slicer("Default AM Cura", true),
-            new Slicer("Slic3r", true),
-            new Slicer("Simplify 3D", false),
-            new Slicer("Cura 2.5", false),
-            new Slicer("Cura 3.0", false)
+            new Slicer("Default AM Cura", "DefaultAMCura", true),
+            new Slicer("Slic3r", "Slic3r", true),
+            new Slicer("Simplify 3D", "Simplify3D", false),
+            new Slicer("Cura 2.5", "Cura20", false),
+            new Slicer("Cura 3.0", "Cura30", false)
     };
 
     private static final Script[] SCRIPTS = {
@@ -122,9 +122,16 @@ public class ControlWindow extends JFrame {
         });
     }
 
-
     public void setSaveButtonEnable(boolean enable) {
         saveButton.setEnabled(enable);
+    }
+
+    public void setSaveAction(Runnable action) {
+        saveButton.addActionListener(e -> action.run());
+    }
+
+    public Slicer getSelectedSlicer() {
+        return (Slicer)slicersDropDown.getSelectedItem();
     }
 
     private void createInformationPanel() {
@@ -159,7 +166,7 @@ public class ControlWindow extends JFrame {
         slicersDropDown = new JComboBox<Slicer>(SLICERS) {
             @Override
             public void setSelectedItem(Object item) {
-                if (item.toString().startsWith("-")) {
+                if (!(item instanceof Slicer) || !((Slicer)item).isEnabled()) {
                     return;
                 }
                 super.setSelectedItem(item);
@@ -363,7 +370,6 @@ public class ControlWindow extends JFrame {
             return this;
         }
     }
-
 
     private void invokeFileSelector(JTextField path) {
         File f = new File(path.getText());
