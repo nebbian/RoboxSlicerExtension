@@ -125,7 +125,7 @@ public class Arguments {
         return slicer;
     }
 
-    public List<File> getInptFiles() {
+    public List<File> getInputFiles() {
         return inputFiles;
     }
 

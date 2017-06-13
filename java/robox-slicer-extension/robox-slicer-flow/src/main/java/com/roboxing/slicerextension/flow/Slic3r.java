@@ -49,7 +49,7 @@ public class Slic3r extends Slicer {
         args.add("--gui");
         args.add("-o");
         args.add(resultGCode.getAbsolutePath());
-        for (File f : getArguments().getInptFiles()) {
+        for (File f : getArguments().getInputFiles()) {
             args.add(f.getAbsolutePath());
         }
 
