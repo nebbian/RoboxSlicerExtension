@@ -27,7 +27,7 @@ public enum OS {
 
     WINDOWS("Windows", "C:\\Program Files\\CEL", System.getProperty("user.home") + File.separator + "CEL Robox", "CuraEngine.exe", "CuraEngine_orig.exe"),
     LINUX("Linux", "~", System.getProperty("user.home") + File.separator + "CEL Robox", "CuraEngine", "CuraEngine_exe"),
-    OSX("OSX", "/Applications/CEL", System.getProperty("user.home") + File.separator + "CEL Robox", "/Applications/CEL/Common/Cura/CuraEngine", "/Applications/CEL/Common/Cura/CuraEngine_exe"),
+    OSX("OSX", "/Applications/CEL", System.getProperty("user.home") + File.separator + "CEL Robox", "Common/Cura/CuraEngine", "Common/Cura/CuraEngine_exe"),
     UNKNOWN("Unknown", "", "", "", "");
 
     private String label;

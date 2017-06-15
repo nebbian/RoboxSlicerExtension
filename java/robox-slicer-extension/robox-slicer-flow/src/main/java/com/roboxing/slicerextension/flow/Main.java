@@ -32,8 +32,6 @@ import com.roboxing.slicerextension.flow.utils.JSONConfiguration;
 public class Main {
     public static void main(String[] args) throws JSONException, IOException {
 
-        System.out.println(Main.class.getClassLoader().getResource("logging.properties"));
-
         Arguments arguments = new Arguments();
         arguments.process(args);
 

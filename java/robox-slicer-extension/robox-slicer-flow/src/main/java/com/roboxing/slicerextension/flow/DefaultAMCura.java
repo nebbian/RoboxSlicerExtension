@@ -42,10 +42,12 @@ public class DefaultAMCura extends Slicer {
     @Override
     public void invoke(File resultGCode) throws IOException, InterruptedException {
         OS os = OS.detect();
+        File amInstallationDir = getArguments().getAMInstallationDir();
+        File curaEngineOrig = new File(amInstallationDir, os.getCuraEngineOrigPath());
 
         String[] args = getArguments().getOriginalArguments();
         String[] commandAndArgs = new String[args.length + 1];
-        commandAndArgs[0] = os.getCuraEngineOrigPath();
+        commandAndArgs[0] = curaEngineOrig.getAbsolutePath();
         System.arraycopy(args, 0, commandAndArgs, 1, args.length);
 
         Process process = new ProcessBuilder(commandAndArgs).start();

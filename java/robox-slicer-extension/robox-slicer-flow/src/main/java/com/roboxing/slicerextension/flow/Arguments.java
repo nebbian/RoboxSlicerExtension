@@ -39,6 +39,8 @@ public class Arguments {
 
     private String roboxFile;
 
+    private File amInstallationDir;
+
     public void process(String[] args) {
         this.originalArguments = args;
         int i = 0;
@@ -66,6 +68,12 @@ public class Arguments {
                     roboxFile = args[i];
                     i++;
                 }
+            } else if (key.equals("--am-installation-dir")) {
+                if (i < args.length) {
+                    key = args[i];
+                    i++;
+                    amInstallationDir = new File(key);
+                }
             } else if (key.endsWith("stl") || key.endsWith("obj")) {
                 inputFiles.add(new File(key));
             } else {
@@ -77,6 +85,20 @@ public class Arguments {
     }
 
     private void ensureArgumentsValid() {
+        if (amInstallationDir ==  null) {
+            try {
+                File jarsFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+                File jarsDir = jarsFile.getParentFile();
+                if ("Common".equalsIgnoreCase(jarsDir.getName())) {
+                    amInstallationDir = jarsDir.getParentFile();
+                } else {
+                    System.err.println("Jar needs to be installed in AM's 'Common' dir or supply --am-installation-dir option with path to AM installation");
+                    System.exit(1);
+                }
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        }
         if (outputFile == null) {
             // Debug mode - values if no input/output arguments set
             String userCelRoboxPath = System.getProperty("user.home") + "/CEL Robox/";
@@ -139,5 +161,9 @@ public class Arguments {
 
     public String getRoboxFile() {
         return roboxFile;
+    }
+
+    public File getAMInstallationDir() {
+        return amInstallationDir;
     }
 }
