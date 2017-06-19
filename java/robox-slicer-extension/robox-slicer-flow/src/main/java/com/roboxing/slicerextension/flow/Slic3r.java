@@ -19,10 +19,13 @@ package com.roboxing.slicerextension.flow;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -59,6 +62,11 @@ public class Slic3r extends Slicer {
     }
 
     public void postProcess(File inFile, File outFile) throws IOException {
+
+        boolean isAbsoluteExtrusion = false;
+        Pattern patternAbsolute = Pattern.compile("^(M82\\s)");
+        Pattern patternExtrusion = Pattern.compile("(E([\\-0-9\\.]+)\\s?)");
+
         int layerCount = 0;
         Pattern pattern = Pattern.compile("^(;LAYER:)");
 
@@ -69,8 +77,57 @@ public class Slic3r extends Slicer {
                     layerCount++;
                     // System.out.println(strLine);
                 }
+                if (!isAbsoluteExtrusion) {
+                    Matcher mExtrusion = patternExtrusion.matcher(strLine);
+                    if(patternAbsolute.matcher(strLine).find()) {
+                        isAbsoluteExtrusion = true;
+                    }
+                    if(mExtrusion.find()){
+                        double currentExtrusion = Double.parseDouble(mExtrusion.group(2));
+                        //1 is a huge value for the start of a layer if relative
+                        //this code will find an absolute extrusion if the layers are really tiny maybe at third or forth layer
+                        if(layerCount>0 && currentExtrusion>2){
+                            isAbsoluteExtrusion = true;
+                        }
+                    }
+                }
             }
         }
+
+        if(isAbsoluteExtrusion){
+            Scanner scExtrusion = new Scanner(inFile, "UTF-8");
+            File slicerResultWithRelativeE = new File(outFile.getParentFile(), outFile.getName() + ".relative");
+            PrintWriter outputRelative = new PrintWriter(slicerResultWithRelativeE);
+
+            double previousExtrusion = 0.0;
+            double currentExtrusion = 0.0;
+            double newExtrusion = 0.0;
+            //DecimalFormat df = new DecimalFormat("#.#####");
+            Matcher m;
+            while (scExtrusion.hasNextLine()) {
+                String strLine = scExtrusion.nextLine();
+                m = patternExtrusion.matcher(strLine);
+                if (m.find()) {
+
+                    currentExtrusion = Double.parseDouble(m.group(2));
+                    if(currentExtrusion>0) {
+                        newExtrusion = currentExtrusion - previousExtrusion;
+                        //System.out.println("Line : " + strLine + ", E : " + currentExtrusion + ", ENew :" + newExtrusion + ", EReplace : " + m.group(0));
+                        //System.out.println("m.group(0) :" + m.group(0));
+                        //String newLine = strLine.replace(m.group(0), String.format(Locale.ROOT, "E%.5g%n", newExtrusion));
+                        String newLine = strLine.replace(m.group(0), "E"+(double)Math.round(newExtrusion * 100000d) / 100000d);
+                        //System.out.println("new Line :" + newLine);
+                        outputRelative.write(newLine+"\n");
+                    }else{
+                        outputRelative.write(strLine+"\n");
+                    }
+                    previousExtrusion = currentExtrusion;
+                }else{
+                    outputRelative.write(strLine+"\n");
+                }
+            }
+        }
+
 
         System.out.println("total layers : " + layerCount);
         // reset scanner
@@ -132,6 +189,8 @@ public class Slic3r extends Slicer {
                     // Remove use absolute coordinates
                 } else if (Pattern.compile("^(M83\\s)").matcher(strLine).find()) {
                     // Remove use relative distances for extrusion
+                } else if (Pattern.compile("^(M82\\s)").matcher(strLine).find()) {
+                    // Remove use absolute distances for extrusion
                 } else if (Pattern.compile("^(DISABLED_G1\\s+)").matcher(strLine).find()) {
                     // Grab all possible commands
                     if ((m = Pattern.compile("(X([\\-0-9\\.]+)\\s)").matcher(strLine)).find()) {

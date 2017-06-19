@@ -99,7 +99,7 @@ public class Arguments {
                 throw new RuntimeException(e);
             }
         }
-        if (outputFile == null) {
+        if (outputFile == null/* && inputFiles.size() == 0*/) {
             // Debug mode - values if no input/output arguments set
             String userCelRoboxPath = System.getProperty("user.home") + "/CEL Robox/";
 
@@ -114,24 +114,30 @@ public class Arguments {
                 }
 
                 // Rename orig if there is already one
-                for (File file : folder.listFiles()) {
-                    System.out.println("File : " + file.getName());
-                    if (file.getName().endsWith(".orig")) {
-                        File gcodeFIle = new File(file.getAbsolutePath().replace(".orig", ""));
-                        gcodeFIle.delete();
-                        file.renameTo(new File(file.getAbsolutePath().replace(".orig","")));
-                        break;
-                    }
-                }
+//                for (File file : folder.listFiles()) {
+//                    System.out.println("File : " + file.getName());
+//                    if (file.getName().endsWith(".orig")) {
+//                        File gcodeFile = new File(file.getAbsolutePath().replace(".orig", ""));
+//                        gcodeFile.delete();
+//                        file.renameTo(new File(file.getAbsolutePath().replace(".orig","")));
+//                        break;
+//                    }
+//                }
                 for (File file : folder.listFiles()) {
                     System.out.println("File : " + file.getName());
                     if (file.getName().endsWith(".gcode") && !file.getName().endsWith("_robox.gcode")) {
                         //textFiles.add(file.getName());
-                        inputFiles.add(file);
-                        outputFile = new File(file.getAbsolutePath()+".orig");
-                        outputFiles.add(outputFile);
+                        //inputFiles.add(file);
+                        //outputFile = new File(file.getAbsolutePath()+".orig");
+                        //outputFiles.add(outputFile);
+                        outputFile = file;
+                        outputFiles.add(file);
                         break;
                     }
+                    /*if (file.getName().endsWith(".stl")) {
+                        //stl file
+                        inputFiles.add(file);
+                    }*/
                 }
                 //stop at first valid folder
                 break;
