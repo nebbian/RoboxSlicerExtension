@@ -91,6 +91,7 @@ while (<INPUT>) {
 	
 		# Output hints
 		if($comment eq "brim") { $hint = "SKIRT";}
+		if($comment eq "skirt") { $hint = "SKIRT";}
 		if($comment eq "perimeter") { $hint = "WALL-OUTER"; }
 		if($comment eq "infill") { $hint = "SKIN"; }
 		if($comment eq "support material") { $hint = "SUPPORT"; }
