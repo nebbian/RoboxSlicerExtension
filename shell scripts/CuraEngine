@@ -18,14 +18,23 @@ fi
 
 #         Command-line arguments, if any, for the operation.
 OPTIONS="$@"
+CURRENTPATH="$PWD/"
+#remove current path to avoid bugs with spaces
+OPTIONSCLEAN=${OPTIONS/$CURRENTPATH/}
+
+#PWDESCAPED=${PWD/ /"\ "}
 
 # Log it.
-echo "`date` + `whoami` + $PWD + $OPERATION "$@"" >> $LOGFILE
+echo "`date` `whoami` $PWD $OPERATION "$@"" >> $LOGFILE
 
+echo "`date` cleanOptions : $OPTIONSCLEAN" >> $LOGFILE
+#echo "`date` PWDESCAPED : $PWDESCAPED" >> $LOGFILE
 
 
 OUTPUTFILE="output.gcode"
-SLICER="/Applications/Slic3r.app/Contents/MacOS/Slic3r"
+#SLICER="/Applications/Slic3r.app/Contents/MacOS/Slic3r"
+#SLICER="java -Duser.dir=$PWDESCAPED -jar robox-slicer-flow-1.0-SNAPSHOT.jar --am-installation-dir /Applications/CEL"
+SLICER="java -jar /Applications/CEL/Common/robox-slicer-flow-1.0-SNAPSHOT.jar"
 INPUTFILES=();
 
 function usage()
@@ -69,7 +78,9 @@ case $key in
     	shift #past argument
     ;;
     *stl)
-    	INPUTFILES=("${INPUTFILES[@]}" "$key")
+      # remove folder
+      cleanfile=$(basename "$key")
+    	INPUTFILES=("${INPUTFILES[@]}" "$cleanfile")
     ;;
     *)
             # unknown option
@@ -83,15 +94,19 @@ regex='PrintJobs'
 if [[ "$PWD" =~ $regex ]]
 then
   # Execute our custom slicer if this is a print job
-  printf -v ARG_LIST '%q ' "--gui" "-o" "$OUTPUTFILE" "${INPUTFILES[@]}"
-  eval "$SLICER $ARG_LIST"
+  #printf -v ARG_LIST '%q ' "--gui" "-o" "$OUTPUTFILE" "${INPUTFILES[@]}"
+  #printf -v ARG_LIST '%q ' "$@"
+  #echo "`date` jarCall : $SLICER $ARG_LIST" >> $LOGFILE
+  #eval "$SLICER $ARG_LIST"
+  echo "`date` jarCall : $SLICER $OPTIONSCLEAN" >> $LOGFILE
+  exec $SLICER "$OPTIONSCLEAN"
   #exec $SLICER "--gui" "-o" "$OUTPUTFILE" ${INPUTFILES[@]}
-  
+
   # Execute Cura slicer if we just want to print something
   #  exec $OPERATION $OPTIONS
 else
   # Use default slicer if we're just calculating times
-  #exec $OPERATION $OPTIONS
-  printf -v ARG_LIST '%q ' "-v" "-p" "-c" "$ROBOXPROFILE" "-o" "$OUTPUTFILE" "${INPUTFILES[@]}"
-  eval "$OPERATION $ARG_LIST"
+  exec $OPERATION $OPTIONSCLEAN
+  #printf -v ARG_LIST '%q ' "-v" "-p" "-c" "$ROBOXPROFILE" "-o" "$OUTPUTFILE" "${INPUTFILES[@]}"
+  #eval "$OPERATION $ARG_LIST"
 fi

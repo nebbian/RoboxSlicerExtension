@@ -39,7 +39,7 @@ public abstract class Slicer {
     private JSONObject slicerConfig;
 
     protected int layerCount=0;
-    protected boolean isAbsoluteExtrusion;
+    protected boolean isAbsoluteExtrusion = false;
     protected File slicerResultWithRelativeE;
     protected RandomAccessFile output;
 
@@ -65,7 +65,7 @@ public abstract class Slicer {
     }
 
     public void postProcess(File inputGCode, File resultGCode) throws IOException{
-        isAbsoluteExtrusion = false;
+        //isAbsoluteExtrusion = false;
         java.util.regex.Pattern patternAbsolute = java.util.regex.Pattern.compile("^(M82\\s)");
         java.util.regex.Pattern patternExtrusion = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s?)");
 
@@ -84,14 +84,14 @@ public abstract class Slicer {
                     if(patternAbsolute.matcher(strLine).find()) {
                         isAbsoluteExtrusion = true;
                     }
-                    if(mExtrusion.find()){
-                        double currentExtrusion = Double.parseDouble(mExtrusion.group(2));
-                        //1 is a huge value for the start of a layer if relative
-                        //this code will find an absolute extrusion if the layers are really tiny maybe at third or forth layer
-                        if(layerCount>0 && currentExtrusion>2){
-                            isAbsoluteExtrusion = true;
-                        }
-                    }
+//                    if(mExtrusion.find()){
+//                        double currentExtrusion = Double.parseDouble(mExtrusion.group(2));
+//                        //1 is a huge value for the start of a layer if relative
+//                        //this code will find an absolute extrusion if the layers are really tiny maybe at third or forth layer
+//                        if(layerCount>0 && currentExtrusion>2){
+//                            isAbsoluteExtrusion = true;
+//                        }
+//                    }
                 }
             }
         }
@@ -190,21 +190,21 @@ public abstract class Slicer {
                     // Remove use absolute distances for extrusion
                 } else if (java.util.regex.Pattern.compile("^(G1\\s+)").matcher(strLine).find()) {
                     String outputCommand="";
-
+                    //System.out.println("G1---:"+strLine);
                     //Grab all possible commands
-                    m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandX = m.group(2); } else { commandX = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(Y([\\-0-9\\.]+)\\s)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(Y([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandY = m.group(2); } else { commandY = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(Z([\\-0-9\\.]+)\\s)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(Z([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandZ = m.group(2); } else { commandZ = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s)").matcher(strLine);
-                    if (m.find()) { commandE = m.group(2); } else { commandE = "false"; }
+                    m = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    if (m.find()) { commandE = m.group(2);} else { commandE = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(F([\\-0-9\\.]+)\\s)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(F([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandSpeed = m.group(2); } else { commandSpeed = "false"; }
 
                     m = java.util.regex.Pattern.compile(";\\s+(.+)$").matcher(strLine);

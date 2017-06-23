@@ -1,0 +1,5 @@
+#!/bin/bash
+#  installer
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cp "$DIR/CuraEngine" /Applications/CEL/Common/Cura/
+cp "$DIR/../java/robox-slicer-extension/robox-slicer-flow/target/robox-slicer-flow-1.0-SNAPSHOT.jar" /Applications/CEL/Common/

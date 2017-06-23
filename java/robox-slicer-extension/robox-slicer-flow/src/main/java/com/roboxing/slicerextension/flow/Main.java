@@ -19,6 +19,10 @@ package com.roboxing.slicerextension.flow;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,7 +34,18 @@ import com.roboxing.slicerextension.flow.utils.JSONConfiguration;
  *
  */
 public class Main {
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
     public static void main(String[] args) throws JSONException, IOException {
+
+        LOGGER.setLevel(Level.ALL);
+        FileHandler fileLog = new FileHandler("Logging.log");
+        SimpleFormatter formatterLog = new SimpleFormatter();
+        fileLog.setFormatter(formatterLog);
+        LOGGER.addHandler(fileLog);
+        LOGGER.addHandler(new java.util.logging.ConsoleHandler());
+        //LOGGER.info("test logging");
+
 
         Arguments arguments = new Arguments();
         arguments.process(args);

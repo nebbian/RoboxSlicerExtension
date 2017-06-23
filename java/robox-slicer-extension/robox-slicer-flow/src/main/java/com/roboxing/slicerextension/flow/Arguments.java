@@ -24,8 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Arguments {
-
-    private static final Logger LOGGER = Logger.getLogger(Arguments.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     private String slicer;
 
@@ -43,6 +42,11 @@ public class Arguments {
 
     public void process(String[] args) {
         this.originalArguments = args;
+        if(args.length>0 && args[0].startsWith("-v -p -c")){
+            //args are in one line need to split them
+            String argsAll = args[0];
+            args = argsAll.split(" ");
+        }
         int i = 0;
         while (i < args.length) {
             String key = args[i];
