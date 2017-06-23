@@ -208,7 +208,7 @@ public abstract class Slicer {
                     if (m.find()) { commandSpeed = m.group(2); } else { commandSpeed = "false"; }
 
                     m = java.util.regex.Pattern.compile(";\\s+(.+)$").matcher(strLine);
-                    if (m.find()) { comment = m.group(2); } else { comment = "false"; }
+                    if (m.find()) { comment = m.group(1); } else { comment = "false"; }
 
                     // Output hints
                     if (comment.equals("skirt") || comment.equals("brim")) {
