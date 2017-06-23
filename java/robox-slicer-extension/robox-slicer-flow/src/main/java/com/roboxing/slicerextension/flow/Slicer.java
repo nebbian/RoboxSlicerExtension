@@ -23,6 +23,7 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
+import java.util.logging.Logger;
 import java.util.regex.*;
 import java.util.regex.Pattern;
 
@@ -33,6 +34,8 @@ import org.json.JSONObject;
  *
  */
 public abstract class Slicer {
+
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     private String name;
     private Arguments args;
@@ -192,19 +195,19 @@ public abstract class Slicer {
                     String outputCommand="";
                     //System.out.println("G1---:"+strLine);
                     //Grab all possible commands
-                    m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s)").matcher(strLine);
                     if (m.find()) { commandX = m.group(2); } else { commandX = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(Y([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(Y([\\-0-9\\.]+)\\s)").matcher(strLine);
                     if (m.find()) { commandY = m.group(2); } else { commandY = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(Z([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(Z([\\-0-9\\.]+)\\s)").matcher(strLine);
                     if (m.find()) { commandZ = m.group(2); } else { commandZ = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s)").matcher(strLine);
                     if (m.find()) { commandE = m.group(2);} else { commandE = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(F([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(F([\\-0-9\\.]+)\\s)").matcher(strLine);
                     if (m.find()) { commandSpeed = m.group(2); } else { commandSpeed = "false"; }
 
                     m = java.util.regex.Pattern.compile(";\\s+(.+)$").matcher(strLine);
@@ -280,6 +283,7 @@ public abstract class Slicer {
                     // Send the command to the file
                     if(outputCommand.length() > 2){
                         //printf NEW "%s\n", $outputCommand;
+                        //LOGGER.info("output : "+outputCommand);
                         writeOutput(String.format("%s\n",outputCommand));
                     }
                 }  else if (java.util.regex.Pattern.compile("^(;LAYER:0)").matcher(strLine).find()) {
@@ -315,6 +319,7 @@ public abstract class Slicer {
 
     }
     protected void writeOutput(String textToWrite) throws IOException {
+        //LOGGER.info(textToWrite);
         output.write(StandardCharsets.UTF_8.encode(textToWrite).array());
     }
 

@@ -98,8 +98,8 @@ then
   #printf -v ARG_LIST '%q ' "$@"
   #echo "`date` jarCall : $SLICER $ARG_LIST" >> $LOGFILE
   #eval "$SLICER $ARG_LIST"
-  echo "`date` jarCall : $SLICER $OPTIONSCLEAN" >> $LOGFILE
-  exec $SLICER "$OPTIONSCLEAN"
+  echo "`date` jarCall : $SLICER $OPTIONSCLEAN 2>>log.log" >> $LOGFILE
+  exec $SLICER "$OPTIONSCLEAN 2>>log.log"
   #exec $SLICER "--gui" "-o" "$OUTPUTFILE" ${INPUTFILES[@]}
 
   # Execute Cura slicer if we just want to print something

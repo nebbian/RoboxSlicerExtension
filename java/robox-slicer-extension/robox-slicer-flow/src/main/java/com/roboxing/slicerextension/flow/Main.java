@@ -58,6 +58,7 @@ public class Main {
             controller.process();
         } catch (Exception e) {
             e.printStackTrace();
+            LOGGER.log(Level.SEVERE,"Error processing : ",e);
             System.exit(1);
         }
     }
