@@ -2,9 +2,27 @@
 #  installer
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CURRENTDIR="$PWD"
+#developper stuff to compile before copying
 cd "$DIR/../java/robox-slicer-extension"
 mvn clean package
 cd "$CURRENTDIR"
 
+actualsize=$(wc -c <"/Applications/CEL/Common/Cura/CuraEngine")
+
+if [ $actualsize -ge 500000 ]; then
+    echo this is the original cura engine, creating copy ...
+    mv "/Applications/CEL/Common/Cura/CuraEngine" "/Applications/CEL/Common/Cura/CuraEngine_exe"
+    cp "/Applications/CEL/Common/Cura/CuraEngine_exe" "/Applications/CEL/Common/Cura/CuraEngine_OriginalBackup"
+else
+    echo "is already a script, check if CuraEngine_exe exists"
+    if [ $(wc -c <"/Applications/CEL/Common/Cura/CuraEngine_exe") -ge 500000 ]; then
+      echo "CuraEngine_exe exists and has good size"
+    else
+      echo "CuraEngine_exe is not ok check your AutoMaker install"
+      exit 0
+    fi
+fi
 cp "$DIR/CuraEngine" /Applications/CEL/Common/Cura/
 cp "$DIR/../java/robox-slicer-extension/robox-slicer-flow/target/robox-slicer-flow-1.0-SNAPSHOT.jar" /Applications/CEL/Common/
+
+echo "installed successfully !"
