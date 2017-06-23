@@ -150,6 +150,7 @@ public abstract class Slicer {
             double currentX = 0.00;
             double currentY = 0.00;
             double currentZ = 0.00;
+            double lastZ = 0.00;
             double commandDistance = 0.00;
             int currentSpeed = 0;
             int lastMoveWasTravel = 0;
@@ -195,19 +196,19 @@ public abstract class Slicer {
                     String outputCommand="";
                     //System.out.println("G1---:"+strLine);
                     //Grab all possible commands
-                    m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandX = m.group(2); } else { commandX = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(Y([\\-0-9\\.]+)\\s)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(Y([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandY = m.group(2); } else { commandY = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(Z([\\-0-9\\.]+)\\s)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(Z([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandZ = m.group(2); } else { commandZ = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandE = m.group(2);} else { commandE = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(F([\\-0-9\\.]+)\\s)").matcher(strLine);
+                    m = java.util.regex.Pattern.compile("(F([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandSpeed = m.group(2); } else { commandSpeed = "false"; }
 
                     m = java.util.regex.Pattern.compile(";\\s+(.+)$").matcher(strLine);
@@ -255,8 +256,13 @@ public abstract class Slicer {
 
                     //Output the X and Y position if required
                     if(!commandX.equals("false") && !commandY.equals("false")){
-                        //outputCommand .= sprintf " F%s X%s Y%s Z%s", $currentSpeed, $commandX, $commandY, $currentZ;
-                        outputCommand += String.format(" F%s X%s Y%s Z%s",currentSpeed, currentX, currentY, currentZ);
+
+                        outputCommand += String.format(" F%s X%s Y%s", currentSpeed, commandX, commandY);
+                        if(lastZ != currentZ){
+                            outputCommand += String.format(" Z%s", currentZ);
+                        }
+
+                        lastZ = currentZ;
                     }
 
                     //
@@ -266,10 +272,10 @@ public abstract class Slicer {
                             //Retract/unretract
 
                             // Print extrusion if not straight after the first layer change
-                            if(totalExtrusion > 0){
+                            //if(totalExtrusion > 0){
                                 //$outputCommand .= sprintf " E%s", $commandE;
                                 outputCommand += String.format(" E%s",commandE);
-                            }
+                            //}
                         } else {
                             // Normal print move
                             //$outputCommand .= sprintf " E%s", $commandE;
