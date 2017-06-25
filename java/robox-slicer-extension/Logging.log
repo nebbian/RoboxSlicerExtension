@@ -1,0 +1,16 @@
+Jun 25, 2017 12:30:57 PM com.roboxing.slicerextension.flow.Arguments process
+FINE: Argument : --am-installation-dir
+Jun 25, 2017 12:30:58 PM com.roboxing.slicerextension.flow.Main main
+SEVERE: Error processing : 
+java.io.IOException: Cannot run program "/Users/daniel/CEL Robox/PrintJobs/../../../CEL3.00.00/Common/Cura/CuraEngine_orig": error=2, No such file or directory
+	at java.lang.ProcessBuilder.start(ProcessBuilder.java:1048)
+	at com.roboxing.slicerextension.flow.DefaultAMCura.invoke(DefaultAMCura.java:53)
+	at com.roboxing.slicerextension.flow.Controller.process(Controller.java:74)
+	at com.roboxing.slicerextension.flow.Main.main(Main.java:58)
+Caused by: java.io.IOException: error=2, No such file or directory
+	at java.lang.UNIXProcess.forkAndExec(Native Method)
+	at java.lang.UNIXProcess.<init>(UNIXProcess.java:247)
+	at java.lang.ProcessImpl.start(ProcessImpl.java:134)
+	at java.lang.ProcessBuilder.start(ProcessBuilder.java:1029)
+	... 3 more
+

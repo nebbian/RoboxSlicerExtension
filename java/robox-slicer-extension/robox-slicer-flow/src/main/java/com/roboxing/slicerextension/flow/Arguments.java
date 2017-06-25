@@ -43,7 +43,7 @@ public class Arguments {
     public void process(String[] args) {
         this.originalArguments = args;
         if(args.length>0 && args[0].startsWith("-v -p -c")){
-            //args are in one line need to split them
+            // args are in one line need to split them
             String argsAll = args[0];
             args = argsAll.split(" ");
         }
