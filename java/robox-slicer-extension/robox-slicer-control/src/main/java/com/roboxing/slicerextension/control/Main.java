@@ -21,7 +21,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.roboxing.slicerextension.control.utils.JSONConfiguration;
 
 /**
  * Main class
@@ -30,7 +33,7 @@ import org.json.JSONObject;
 public class Main {
     public static void main(String[] args) {
         final ControlWindow controlWindow = new ControlWindow();
-
+        load(controlWindow);
         controlWindow.setLeaveAction(() -> System.exit(0));
 
         controlWindow.setPreProcessorScriptPathChanged(path -> {
@@ -55,6 +58,19 @@ public class Main {
 
         controlWindow.setSaveAction(() -> save(controlWindow));
         controlWindow.setVisible(true);
+    }
+
+    private static void load(ControlWindow controlWindow) {
+        File configFile = new File(new File(OS.detect().getRoboxFolder()), ".slicerextension.config");
+        if (configFile.exists()) {
+            try {
+                JSONObject jsonConfig = JSONConfiguration.readConfig(configFile);
+                Configuration configuration = Configuration.fromJSON(jsonConfig);
+                configuration.updateControlWindow(controlWindow);
+            } catch (JSONException | IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private static void save(ControlWindow controlWindow) {

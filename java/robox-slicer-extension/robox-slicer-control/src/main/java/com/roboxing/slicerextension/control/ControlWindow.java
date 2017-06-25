@@ -134,6 +134,15 @@ public class ControlWindow extends JFrame {
         return (Slicer)slicersDropDown.getSelectedItem();
     }
 
+    public void setSelectedSlicer(String slicerId) {
+        for (Slicer slicer : SLICERS) {
+            if (slicer.getConfigString().equals(slicerId)) {
+                slicersDropDown.setSelectedItem(slicer);
+                return;
+            }
+        }
+    }
+
     private void createInformationPanel() {
         informationPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
 
