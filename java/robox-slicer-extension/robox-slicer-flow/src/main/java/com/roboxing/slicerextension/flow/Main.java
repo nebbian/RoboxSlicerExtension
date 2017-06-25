@@ -19,6 +19,7 @@ package com.roboxing.slicerextension.flow;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.ConsoleHandler;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,30 +35,41 @@ import com.roboxing.slicerextension.flow.utils.JSONConfiguration;
  *
  */
 public class Main {
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) throws JSONException, IOException {
 
-        LOGGER.setLevel(Level.ALL);
-        FileHandler fileLog = new FileHandler("Logging.log");
+        File celFolder = new File(OS.detect().getRoboxFolder());
+        File logFile = new File(celFolder, "robox-slicer-extension.log");
+
+        System.setProperty("java.util.logging.SimpleFormatter.format", "%1$tH:%1$tM:%1$tS.%1$tL %4$-7s [%2$-15s] %5$s %6$s%n");
+        Logger rootLogger = Logger.getLogger("");
+        rootLogger.setLevel(Level.ALL);
+        FileHandler fileLog = new FileHandler(logFile.getAbsolutePath());
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+
         SimpleFormatter formatterLog = new SimpleFormatter();
         fileLog.setFormatter(formatterLog);
-        LOGGER.addHandler(fileLog);
-        LOGGER.addHandler(new java.util.logging.ConsoleHandler());
-        //LOGGER.info("test logging");
+        consoleHandler.setFormatter(formatterLog);
+        rootLogger.addHandler(fileLog);
+        rootLogger.addHandler(consoleHandler);
 
+        System.out.println("Logging to " + logFile.getAbsolutePath());
+        rootLogger.info("Started robox slicer extension");
 
         Arguments arguments = new Arguments();
         arguments.process(args);
 
-        File configFile = new File(new File(OS.detect().getRoboxFolder()), ".slicerextension.config");
+        File configFile = new File(celFolder, ".slicerextension.config");
         JSONObject configuration = JSONConfiguration.readConfig(configFile);
 
         Controller controller = new Controller(arguments, configuration);
         try {
             controller.process();
+            Logger LOGGER = Logger.getLogger(Main.class.getName());
+            LOGGER.info("Finished slicing.");
+            System.exit(0);
         } catch (Exception e) {
-            e.printStackTrace();
+            Logger LOGGER = Logger.getLogger(Main.class.getName());
             LOGGER.log(Level.SEVERE,"Error processing : ",e);
             System.exit(1);
         }

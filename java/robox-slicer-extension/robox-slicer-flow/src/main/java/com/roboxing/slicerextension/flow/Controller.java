@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Logger;
 
 import org.json.JSONObject;
 
@@ -40,6 +41,7 @@ import com.roboxing.slicerextension.flow.utils.JSONConfiguration;
  *
  */
 public class Controller {
+    private static final Logger LOGGER = Logger.getLogger(Controller.class.getName());
 
     private Arguments arguments;
     private JSONObject configuration;
@@ -57,8 +59,10 @@ public class Controller {
         if (currentDir.toString().contains("PrintJobs")) {
             // Use configuration to get slicer's name. If configuration's key 'slicer' does not exist, default to Slic3r
             slicerName = getConfString(configuration, "slicer").orElse(Slicers.Slic3r.name());
+            LOGGER.fine("Selecting " + slicerName + " - current dir contains 'PrintJobs'; " + currentDir.toString());
         } else {
             slicerName = Slicers.DefaultAMCura.name();
+            LOGGER.fine("Selecting " + slicerName + " - current dir does not contain 'PrintJobs'; " + currentDir.toString());
         }
 
         // Fetch particular slicer's configuration (under key 'slicerXXX'), defaulting to empty JSON object if not present.
@@ -71,8 +75,13 @@ public class Controller {
 
         File slicerResultingGCode = new File(arguments.getOutputFile().getParentFile(), arguments.getOutputFile().getName().replace(".gcode",".slicer.gcode"));
 
+        LOGGER.fine("Invoking " + slicerName);
         slicer.invoke(slicerResultingGCode);
 
+        LOGGER.fine("Finished slicing with " + slicerName);
+
+        LOGGER.fine("Invoking post processing " + slicerName);
         slicer.postProcess(slicerResultingGCode, arguments.getOutputFile());
+        LOGGER.fine("Finished post processing " + slicerName);
     }
 }

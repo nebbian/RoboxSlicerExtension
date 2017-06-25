@@ -19,16 +19,9 @@ package com.roboxing.slicerextension.flow;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.RandomAccessFile;
-import java.nio.charset.StandardCharsets;
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.Scanner;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.logging.Logger;
 
 import org.json.JSONObject;
 
@@ -37,12 +30,11 @@ import org.json.JSONObject;
  *
  */
 public class Slic3r extends Slicer {
-
+    private static final Logger LOGGER = Logger.getLogger(DefaultAMCura.class.getName());
 
     public Slic3r(JSONObject slicerConfig) {
         super("Slic3r", slicerConfig);
     }
-
 
     @Override
     public void invoke(File resultGCode) throws IOException, InterruptedException {
@@ -55,6 +47,10 @@ public class Slic3r extends Slicer {
             args.add(f.getAbsolutePath());
         }
 
+        LOGGER.fine("Invoking Slic3r with args: ");
+        for (String a : args) {
+            LOGGER.fine("  " + a);
+        }
         Process process = new ProcessBuilder(args.toArray(new String[args.size()])).start();
 
         process.waitFor();

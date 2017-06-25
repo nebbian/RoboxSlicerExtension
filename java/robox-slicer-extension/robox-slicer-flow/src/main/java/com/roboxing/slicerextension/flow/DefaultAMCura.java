@@ -19,6 +19,7 @@ package com.roboxing.slicerextension.flow;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Logger;
 
 import org.json.JSONObject;
 
@@ -27,16 +28,10 @@ import org.json.JSONObject;
  *
  */
 public class DefaultAMCura extends Slicer {
+    private static final Logger LOGGER = Logger.getLogger(DefaultAMCura.class.getName());
 
     public DefaultAMCura(JSONObject slicerConfig) {
         super("DefaultAMCura", slicerConfig);
-    }
-
-    @Override
-    public void postProcess(File slicerGCode, File resultGCode) throws IOException {
-        if (!slicerGCode.renameTo(resultGCode)) {
-            throw new IOException("Cannot rename '" + slicerGCode.getPath() + "' to '" + resultGCode.getPath() + "'");
-        }
     }
 
     @Override
@@ -45,13 +40,32 @@ public class DefaultAMCura extends Slicer {
         File amInstallationDir = getArguments().getAMInstallationDir();
         File curaEngineOrig = new File(amInstallationDir, os.getCuraEngineOrigPath());
 
+        LOGGER.fine("Invoking default slicer; " + curaEngineOrig.getAbsolutePath());
+
         String[] args = getArguments().getOriginalArguments();
         String[] commandAndArgs = new String[args.length + 1];
         commandAndArgs[0] = curaEngineOrig.getAbsolutePath();
         System.arraycopy(args, 0, commandAndArgs, 1, args.length);
 
+        for (int i = 0; i < commandAndArgs.length; i++) {
+            if (commandAndArgs[i].equals(getArguments().getOriginalOutputFileString())) {
+                LOGGER.finest("Replaced " + commandAndArgs[i] + " with " + resultGCode.getAbsolutePath());
+                commandAndArgs[i] = resultGCode.getAbsolutePath();
+            }
+        }
+        LOGGER.fine("Invoking default Cura slicer with args: ");
+        for (int i = 0; i < commandAndArgs.length; i++) {
+            LOGGER.fine("  " + commandAndArgs[i]);
+        }
         Process process = new ProcessBuilder(commandAndArgs).start();
 
         process.waitFor();
+    }
+
+    @Override
+    public void postProcess(File slicerGCode, File resultGCode) throws IOException {
+        if (!slicerGCode.renameTo(resultGCode)) {
+            throw new IOException("Cannot rename '" + slicerGCode.getPath() + "' to '" + resultGCode.getPath() + "'");
+        }
     }
 }

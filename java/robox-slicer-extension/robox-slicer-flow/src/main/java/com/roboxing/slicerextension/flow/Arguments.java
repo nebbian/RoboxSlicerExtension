@@ -17,14 +17,16 @@
 */
 package com.roboxing.slicerextension.flow;
 
+import static java.util.Arrays.asList;
+
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class Arguments {
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(Arguments.class.getName());
 
     private String slicer;
 
@@ -34,6 +36,8 @@ public class Arguments {
 
     private File outputFile;
 
+    private String originalOutputFileString;
+
     private List<File> outputFiles = new ArrayList<>();
 
     private String roboxFile;
@@ -42,22 +46,30 @@ public class Arguments {
 
     public void process(String[] args) {
         this.originalArguments = args;
-        if(args.length>0 && args[0].startsWith("-v -p -c")){
+        List<String> arguments = asList(args);
+        if (arguments.size() > 0 && arguments.get(0).startsWith("-v -p -c")) {
+            String argsAll = arguments.get(0);
             // args are in one line need to split them
-            String argsAll = args[0];
-            args = argsAll.split(" ");
+            arguments.remove(0);
+
+            arguments.addAll(0, asList(argsAll));
+        }
+        LOGGER.fine("Invoked with arguments:");
+        for (String a : arguments) {
+            LOGGER.fine("  " + a);
         }
         int i = 0;
-        while (i < args.length) {
-            String key = args[i];
-            LOGGER.log(Level.FINE, "Argument : "+key);
+        while (i < arguments.size()) {
+            String key = arguments.get(i);
+            LOGGER.finer("Argument : " + key);
             i++;
             if (key.equals("-s")) {
                 slicer = key;
             } else if (key.equals("-o") || key.equals("--output")) {
-                if (i < args.length) {
-                    key = args[i];
+                if (i < arguments.size()) {
+                    key = arguments.get(i);
                     i++;
+                    originalOutputFileString = key;
                     outputFile = new File(key);
                     outputFiles.add(outputFile);
                 }
@@ -66,17 +78,21 @@ public class Arguments {
             } else if (key.equals("-p")) {
                 // Show progress - ignore parameter
             } else if (key.equals("-c")) {
-                if (i >= args.length) {
+                if (i >= arguments.size()) {
                     System.err.println("Switch '-c' needs to be followed by file");
                 } else {
-                    roboxFile = args[i];
+                    roboxFile = arguments.get(i);
                     i++;
                 }
             } else if (key.equals("--am-installation-dir")) {
-                if (i < args.length) {
-                    key = args[i];
+                if (i < arguments.size()) {
+                    key = arguments.get(i);
                     i++;
-                    amInstallationDir = new File(key);
+                    amInstallationDir = new File(key).getAbsoluteFile();
+                    try {
+                        amInstallationDir = amInstallationDir.getCanonicalFile();
+                    } catch (IOException ignore) { }
+                    LOGGER.config("Set AM installation dir to " + amInstallationDir);
                 }
             } else if (key.endsWith("stl") || key.endsWith("obj")) {
                 inputFiles.add(new File(key));
@@ -92,11 +108,12 @@ public class Arguments {
         if (amInstallationDir ==  null) {
             try {
                 File jarsFile = new File(getClass().getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-                File jarsDir = jarsFile.getParentFile();
+                File jarsDir = jarsFile.getParentFile().getAbsoluteFile();
                 if ("Common".equalsIgnoreCase(jarsDir.getName())) {
                     amInstallationDir = jarsDir.getParentFile();
+                    LOGGER.config("Assumed AM installation dir as " + jarsDir.getParentFile().getAbsolutePath());
                 } else {
-                    System.err.println("Jar needs to be installed in AM's 'Common' dir or supply --am-installation-dir option with path to AM installation");
+                    LOGGER.severe("Jar needs to be installed in AM's 'Common' dir or supply --am-installation-dir option with path to AM installation");
                     System.exit(1);
                 }
             } catch (Exception e) {
@@ -128,7 +145,7 @@ public class Arguments {
 //                    }
 //                }
                 for (File file : folder.listFiles()) {
-                    System.out.println("File : " + file.getName());
+                    LOGGER.finer("File : " + file.getName());
                     if (file.getName().endsWith(".gcode") && !file.getName().endsWith("_robox.gcode")) {
                         //textFiles.add(file.getName());
                         //inputFiles.add(file);
@@ -159,6 +176,10 @@ public class Arguments {
 
     public List<File> getInputFiles() {
         return inputFiles;
+    }
+
+    public String getOriginalOutputFileString() {
+        return originalOutputFileString;
     }
 
     public File getOutputFile() {

@@ -12,7 +12,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Robox Slicer Extension.  If not, see <http://www.gnu.org/licenses/>.
+ * along with Robox Slicer Extension.  If not, see <http:// www.gnu.org/licenses/>.
  *
 */
 package com.roboxing.slicerextension.flow;
@@ -24,7 +24,7 @@ import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.logging.Logger;
-import java.util.regex.*;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.json.JSONObject;
@@ -68,7 +68,7 @@ public abstract class Slicer {
     }
 
     public void postProcess(File inputGCode, File resultGCode) throws IOException{
-        //isAbsoluteExtrusion = false;
+        // isAbsoluteExtrusion = false;
         java.util.regex.Pattern patternAbsolute = java.util.regex.Pattern.compile("^(M82\\s)");
         java.util.regex.Pattern patternExtrusion = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s?)");
 
@@ -84,14 +84,14 @@ public abstract class Slicer {
                 }
                 if (!isAbsoluteExtrusion) {
                     Matcher mExtrusion = patternExtrusion.matcher(strLine);
-                    if(patternAbsolute.matcher(strLine).find()) {
+                    if (patternAbsolute.matcher(strLine).find()) {
                         isAbsoluteExtrusion = true;
                     }
-//                    if(mExtrusion.find()){
+//                    if (mExtrusion.find()){
 //                        double currentExtrusion = Double.parseDouble(mExtrusion.group(2));
-//                        //1 is a huge value for the start of a layer if relative
-//                        //this code will find an absolute extrusion if the layers are really tiny maybe at third or forth layer
-//                        if(layerCount>0 && currentExtrusion>2){
+//                        // 1 is a huge value for the start of a layer if relative
+//                        // this code will find an absolute extrusion if the layers are really tiny maybe at third or forth layer
+//                        if (layerCount>0 && currentExtrusion>2){
 //                            isAbsoluteExtrusion = true;
 //                        }
 //                    }
@@ -99,7 +99,7 @@ public abstract class Slicer {
             }
         }
 
-        if(isAbsoluteExtrusion){
+        if (isAbsoluteExtrusion){
             Scanner scExtrusion = new Scanner(inputGCode, "UTF-8");
             slicerResultWithRelativeE = new File(resultGCode.getParentFile(), resultGCode.getName() + ".relative");
             PrintWriter outputRelative = new PrintWriter(slicerResultWithRelativeE);
@@ -107,7 +107,7 @@ public abstract class Slicer {
             double previousExtrusion = 0.0;
             double currentExtrusion;
             double newExtrusion;
-            //DecimalFormat df = new DecimalFormat("#.#####");
+            // DecimalFormat df = new DecimalFormat("#.#####");
             Matcher m;
             while (scExtrusion.hasNextLine()) {
                 String strLine = scExtrusion.nextLine();
@@ -115,23 +115,23 @@ public abstract class Slicer {
                 if (m.find()) {
 
                     currentExtrusion = Double.parseDouble(m.group(2));
-                    if(currentExtrusion>0) {
+                    if (currentExtrusion>0) {
                         newExtrusion = currentExtrusion - previousExtrusion;
-                        //System.out.println("Line : " + strLine + ", E : " + currentExtrusion + ", ENew :" + newExtrusion + ", EReplace : " + m.group(0));
-                        //System.out.println("m.group(0) :" + m.group(0));
-                        //String newLine = strLine.replace(m.group(0), String.format(Locale.ROOT, "E%.5g%n", newExtrusion));
+                        // System.out.println("Line : " + strLine + ", E : " + currentExtrusion + ", ENew :" + newExtrusion + ", EReplace : " + m.group(0));
+                        // System.out.println("m.group(0) :" + m.group(0));
+                        // String newLine = strLine.replace(m.group(0), String.format(Locale.ROOT, "E%.5g%n", newExtrusion));
                         String newLine = strLine.replace(m.group(0), "E"+(double)Math.round(newExtrusion * 100000d) / 100000d);
-                        //System.out.println("new Line :" + newLine);
+                        // System.out.println("new Line :" + newLine);
                         outputRelative.write(newLine+"\n");
-                    }else{
+                    } else {
                         outputRelative.write(strLine+"\n");
                     }
                     previousExtrusion = currentExtrusion;
-                }else{
+                } else {
                     outputRelative.write(strLine+"\n");
                 }
             }
-            //if extrusion was absolute use the relative E converted file as input
+            // if extrusion was absolute use the relative E converted file as input
             inputGCode = slicerResultWithRelativeE;
         }
 
@@ -194,8 +194,8 @@ public abstract class Slicer {
                     // Remove use absolute distances for extrusion
                 } else if (java.util.regex.Pattern.compile("^(G1\\s+)").matcher(strLine).find()) {
                     String outputCommand="";
-                    //System.out.println("G1---:"+strLine);
-                    //Grab all possible commands
+                    // System.out.println("G1---:"+strLine);
+                    // Grab all possible commands
                     m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandX = m.group(2); } else { commandX = "false"; }
 
@@ -233,8 +233,8 @@ public abstract class Slicer {
                         oldHint = hint;
                     }
 
-                    //Figure out if this is a travel move or not
-                    if(!commandE.equals("false")){
+                    // Figure out if this is a travel move or not
+                    if (!commandE.equals("false")){
                         outputCommand = "G1";	// Printing move
                     } else {
                         outputCommand = "G0";	// Travel move
@@ -243,22 +243,22 @@ public abstract class Slicer {
                     // ---- Build command for output ----
 
                     // Output speed if present
-                    if(!commandSpeed.equals("false")){
-                        //convert speed to double and round the result ! be cause sometimes the speed is given with a point
+                    if (!commandSpeed.equals("false")){
+                        // convert speed to double and round the result ! be cause sometimes the speed is given with a point
                         currentSpeed = (int)Math.round(Double.parseDouble(commandSpeed));
                     }
 
                     // Remember the Z position if required
-                    if(!commandZ.equals("false")){
+                    if (!commandZ.equals("false")){
                         currentZ = Double.parseDouble(commandZ);
                         oldHint = "";
                     }
 
-                    //Output the X and Y position if required
-                    if(!commandX.equals("false") && !commandY.equals("false")){
+                    // Output the X and Y position if required
+                    if (!commandX.equals("false") && !commandY.equals("false")){
 
                         outputCommand += String.format(" F%s X%s Y%s", currentSpeed, commandX, commandY);
-                        if(lastZ != currentZ){
+                        if (lastZ != currentZ){
                             outputCommand += String.format(" Z%s", currentZ);
                         }
 
@@ -266,19 +266,19 @@ public abstract class Slicer {
                     }
 
                     //
-                    if(!commandE.equals("false")){
-                        //Find retract/unretract
-                        if(commandX.equals("false") && commandY.equals("false")){
-                            //Retract/unretract
+                    if (!commandE.equals("false")){
+                        // Find retract/unretract
+                        if (commandX.equals("false") && commandY.equals("false")){
+                            // Retract/unretract
 
                             // Print extrusion if not straight after the first layer change
-                            //if(totalExtrusion > 0){
-                                //$outputCommand .= sprintf " E%s", $commandE;
+                            // if (totalExtrusion > 0){
+                                // $outputCommand .= sprintf " E%s", $commandE;
                                 outputCommand += String.format(" E%s",commandE);
-                            //}
+                            // }
                         } else {
                             // Normal print move
-                            //$outputCommand .= sprintf " E%s", $commandE;
+                            // $outputCommand .= sprintf " E%s", $commandE;
                             outputCommand += String.format(" E%s",commandE);
                         }
                         totalExtrusion += Double.parseDouble(commandE);
@@ -287,23 +287,23 @@ public abstract class Slicer {
 
 
                     // Send the command to the file
-                    if(outputCommand.length() > 2){
-                        //printf NEW "%s\n", $outputCommand;
-                        //LOGGER.info("output : "+outputCommand);
+                    if (outputCommand.length() > 2){
+                        // printf NEW "%s\n", $outputCommand;
+                        // LOGGER.info("output : "+outputCommand);
                         writeOutput(String.format("%s\n",outputCommand));
                     }
                 }  else if (java.util.regex.Pattern.compile("^(;LAYER:0)").matcher(strLine).find()) {
                     // Output the layer count
                     writeOutput(String.format(";Layer count: %d\n", layerCount));
                     writeOutput(strLine + "\n");
-                    //extrusionAfterRetraction = 0;
+                    // extrusionAfterRetraction = 0;
                 } else if (java.util.regex.Pattern.compile("^(;LAYER:)").matcher(strLine).find()) {
                     // Output the layer number
                     writeOutput(strLine + "\n");
-                    //$extrusionAfterRetraction = 0;
+                    // $extrusionAfterRetraction = 0;
                 }  else {
-                    //System.out.println(strLine);
-                    //StandardCharsets.UTF_8.encode(strLine).array()
+                    // System.out.println(strLine);
+                    // StandardCharsets.UTF_8.encode(strLine).array()
                     writeOutput(strLine + "\n");
                 }
 
@@ -325,7 +325,7 @@ public abstract class Slicer {
 
     }
     protected void writeOutput(String textToWrite) throws IOException {
-        //LOGGER.info(textToWrite);
+        // LOGGER.info(textToWrite);
         output.write(StandardCharsets.UTF_8.encode(textToWrite).array());
     }
 
