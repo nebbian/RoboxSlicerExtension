@@ -76,7 +76,6 @@ This code should be considered pre-alpha, it hasn't been tested extensively.  Us
 ### Known issues
 
 * The current version of Slic3r [has a bug when using multiple STL files](https://github.com/prusa3d/Slic3r/issues/313). 
-* The current version of Slic3r [crashes when enabling the layer editing function](https://github.com/prusa3d/Slic3r/issues/315)
 
 ### Authors
 
