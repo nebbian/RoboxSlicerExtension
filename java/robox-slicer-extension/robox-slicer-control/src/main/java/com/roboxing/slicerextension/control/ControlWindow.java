@@ -62,7 +62,7 @@ public class ControlWindow extends JFrame {
             new Slicer("Default AM Cura", "DefaultAMCura", true),
             new Slicer("Slic3r", "Slic3r", true),
             new Slicer("Simplify 3D", "Simplify3D", false),
-            new Slicer("Cura 2.5", "Cura20", false),
+            new Slicer("Cura 2.5", "Cura20", true),
             new Slicer("Cura 3.0", "Cura30", false)
     };
 

@@ -83,7 +83,7 @@ public abstract class Slicer {
                     // System.out.println(strLine);
                 }
                 if (!isAbsoluteExtrusion) {
-                    Matcher mExtrusion = patternExtrusion.matcher(strLine);
+                    //Matcher mExtrusion = patternExtrusion.matcher(strLine);
                     if (patternAbsolute.matcher(strLine).find()) {
                         isAbsoluteExtrusion = true;
                     }
@@ -101,7 +101,7 @@ public abstract class Slicer {
 
         if (isAbsoluteExtrusion){
             Scanner scExtrusion = new Scanner(inputGCode, "UTF-8");
-            slicerResultWithRelativeE = new File(resultGCode.getParentFile(), resultGCode.getName() + ".relative");
+            slicerResultWithRelativeE = new File(resultGCode.getParentFile(), resultGCode.getName().replace(".gcode", ".slicer.relative.gcode"));
             PrintWriter outputRelative = new PrintWriter(slicerResultWithRelativeE);
 
             double previousExtrusion = 0.0;
@@ -192,6 +192,8 @@ public abstract class Slicer {
                     // Remove use relative distances for extrusion
                 } else if (java.util.regex.Pattern.compile("^(M82\\s)").matcher(strLine).find()) {
                     // Remove use absolute distances for extrusion
+                } else if (java.util.regex.Pattern.compile("^(G28\\s)").matcher(strLine).find()) {
+                    // Remove home
                 } else if (java.util.regex.Pattern.compile("^(G1\\s+)").matcher(strLine).find()) {
                     String outputCommand="";
                     // System.out.println("G1---:"+strLine);

@@ -27,7 +27,8 @@ import org.json.JSONObject;
  */
 public enum Slicers {
     DefaultAMCura,
-    Slic3r;
+    Slic3r,
+    Cura20;
 
     public static Slicer toSlicer(String selected, JSONObject slicerConfig) {
         return toSlicer(Slicers.valueOf(selected), slicerConfig);
