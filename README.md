@@ -25,12 +25,13 @@ and it will do these steps for you:
 - download CuraEngine and slic3r_postprocess.pl to the right paths
 - and download Robox_slic3r_config_bundle.ini to <AM Install Dir>/Slic3r/Config for your convenience
 
+You will need to do the following steps manually:
 * Open Slic3r, and choose "Load Config Bundle..." from the File menu.
 * Choose "Robox_slic3r_config_bundle.ini" from the slic3r/config directory.
 
 You should now see that you have some new presets for Print Settings, Filament Settings, and Printer Settings, all of which have "Robox" in the name. 
 
-* Close slic3r
+Now close slic3r.  It will reopen when you try to print something in Automaker.
 
 
 
