@@ -104,7 +104,7 @@ The bottom one is 'executable' jar. In IDE's you don't need any of it. Just impo
 
 ### Known issues
 
-* The current version of Slic3r [has a bug when using multiple STL files](https://github.com/prusa3d/Slic3r/issues/313). 
+* Windows and Linux compatibility is not yet completed.
 
 ### Authors
 
