@@ -144,6 +144,7 @@ public abstract class Slicer {
 
             double minExtrusionLength = 0;  // Minimum extrusion length before we will allow a retraction
             double minTravelDistance = 0.01;  // Minimum distance of travel before we actually take the command seriously
+            double minPrintDistance = 0.01;  // Minimum distance of printing before we send the command to the postprocessor
 
             String oldHint = "";
             String hint = "";
@@ -156,6 +157,8 @@ public abstract class Slicer {
             int lastMoveWasTravel = 0;
             int lastMoveWasRetract = 0;
             double totalExtrusion=0;
+            boolean extruding = false;
+            boolean printMoveValid = false;
 
 
             String commandX;
@@ -196,6 +199,8 @@ public abstract class Slicer {
                     // Remove home
                 } else if (java.util.regex.Pattern.compile("^(G1\\s+)").matcher(strLine).find()) {
                     String outputCommand="";
+                    printMoveValid = true;
+                    
                     // System.out.println("G1---:"+strLine);
                     // Grab all possible commands
                     m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s?)").matcher(strLine);
@@ -267,7 +272,8 @@ public abstract class Slicer {
                         lastZ = currentZ;
                     }
 
-                    //
+                    extruding = false;
+                    
                     if (!commandE.equals("false")){
                         // Find retract/unretract
                         if (commandX.equals("false") && commandY.equals("false")){
@@ -282,14 +288,19 @@ public abstract class Slicer {
                             // Normal print move
                             // $outputCommand .= sprintf " E%s", $commandE;
                             outputCommand += String.format(" E%s",commandE);
+                            extruding = true;
                         }
                         totalExtrusion += Double.parseDouble(commandE);
 
                     }
 
-
+					// Don't output printing moves with zero movement
+					if((extruding == true) && (commandDistance < minPrintDistance)){
+						printMoveValid = false;
+					}
+					
                     // Send the command to the file
-                    if (outputCommand.length() > 2){
+                    if ((printMoveValid == true) && (outputCommand.length() > 2)){
                         // printf NEW "%s\n", $outputCommand;
                         // LOGGER.info("output : "+outputCommand);
                         writeOutput(String.format("%s\n",outputCommand));
