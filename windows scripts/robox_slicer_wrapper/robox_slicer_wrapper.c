@@ -11,13 +11,16 @@ int main (int argc, char *argv[])
 	FILE *fp;
 	int i = 11;
 	char outputCommand[1000];
+	char logFilePath[1000];
 	bool isForEstimation = false;
-	
 	char* slic3rPath = "C:/Program Files/Slic3r/slic3r-console.exe";
 
-   
+	char* pwd = _getcwd(NULL, 0);
+
+    sprintf(logFilePath, "%s/slicer_wrapper.log", pwd);
+
 	/* open the log file */
-	fp = fopen("C:/Users/IEUser/Desktop/slicer_wrapper.log", "a");
+	fp = fopen(logFilePath, "a");
 	if (fp == NULL) {
 		printf("I couldn't open slicer_wrapper.log for appending.\n");
 		exit(0);
@@ -36,7 +39,6 @@ int main (int argc, char *argv[])
 	}
 
 
-	char* pwd = _getcwd(NULL, 0);
 	if (pwd) fprintf(fp, "pwd = %s\n", pwd);
 
 
