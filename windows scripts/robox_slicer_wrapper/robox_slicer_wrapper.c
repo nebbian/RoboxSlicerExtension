@@ -17,7 +17,7 @@ int main (int argc, char *argv[])
 
 	char* pwd = _getcwd(NULL, 0);
 
-    sprintf(logFilePath, "%s/slicer_wrapper.log", pwd);
+	sprintf(logFilePath, "%s/slicer_wrapper.log", pwd);
 
 	/* open the log file */
 	fp = fopen(logFilePath, "a");
