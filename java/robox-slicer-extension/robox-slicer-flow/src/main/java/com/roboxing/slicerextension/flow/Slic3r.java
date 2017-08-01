@@ -39,13 +39,7 @@ public class Slic3r extends Slicer {
     @Override
     public void invoke(File resultGCode) throws IOException, InterruptedException {
         List<String> args = new ArrayList<>();
-        
-        if(OS.detect().getLabel() == "Windows"){
-	        args.add("C:/Program Files/Slic3r/slic3r-console.exe");            
-        }
-        else {
-	        args.add("/Applications/Slic3r.app/Contents/MacOS/Slic3r");    
-        }
+        args.add("/Applications/Slic3r.app/Contents/MacOS/Slic3r");
         args.add("--gui");
         args.add("-o");
         args.add(resultGCode.getAbsolutePath());
