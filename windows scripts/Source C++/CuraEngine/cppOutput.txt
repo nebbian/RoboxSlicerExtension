@@ -1,5 +1,0 @@
-exe path : c:\users\benjamin-mac\documents\visual studio 2017\Projects\CuraEngine\Debug\CuraEngine.exe
-working path : c:/Users/benjamin-mac/documents/visual studio 2017/Projects/CuraEngine/CuraEngine
-exefilePath : c:\users\benjamin-mac\documents\visual studio 2017\Projects\CuraEngine\Debug
-c:/users/benjamin-mac/documents/visual studio 2017/Projects/CuraEngine/Debug
-""c:/users/benjamin-mac/documents/visual studio 2017/Projects/CuraEngine/Debug/../../Automaker/java/bin/java.exe" -jar "c:/users/benjamin-mac/documents/visual studio 2017/Projects/CuraEngine/Debug/../robox-slicer-flow-1.0-SNAPSHOT.jar" "
