@@ -68,6 +68,7 @@ public abstract class Slicer {
     }
 
     public void postProcess(File inputGCode, File resultGCode) throws IOException{
+
         // isAbsoluteExtrusion = false;
         java.util.regex.Pattern patternAbsolute = java.util.regex.Pattern.compile("^(M82\\s)");
         java.util.regex.Pattern patternExtrusion = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s?)");
@@ -122,13 +123,13 @@ public abstract class Slicer {
                         // String newLine = strLine.replace(m.group(0), String.format(Locale.ROOT, "E%.5g%n", newExtrusion));
                         String newLine = strLine.replace(m.group(0), "E"+(double)Math.round(newExtrusion * 100000d) / 100000d);
                         // System.out.println("new Line :" + newLine);
-                        outputRelative.write(newLine+"\n");
+                        outputRelative.println(newLine);
                     } else {
-                        outputRelative.write(strLine+"\n");
+                        outputRelative.println(strLine);
                     }
                     previousExtrusion = currentExtrusion;
                 } else {
-                    outputRelative.write(strLine+"\n");
+                    outputRelative.println(strLine);
                 }
             }
             // if extrusion was absolute use the relative E converted file as input
@@ -180,7 +181,7 @@ public abstract class Slicer {
                 }
                 if ((m = java.util.regex.Pattern.compile("^(M204\\s+S(\\d+))").matcher(strLine)).find()) {
                     // printf NEW "M201 X%d Y%d Z%d E2000\n", $2, $2, $2;
-                    writeOutput(String.format("M201 X%d Y%d Z%d E2000\n", m.group(2), m.group(2), m.group(2)));
+                    writeOutputLine(String.format("M201 X%d Y%d Z%d E2000", m.group(2), m.group(2), m.group(2)));
                 } else if (java.util.regex.Pattern.compile("^(M190\\s)").matcher(strLine).find()) {
                     // Remove bed temperature settings
                 } else if (java.util.regex.Pattern.compile("^(M104\\s)").matcher(strLine).find()) {
@@ -236,7 +237,7 @@ public abstract class Slicer {
                     }
 
                     if (hint != oldHint) {
-                        writeOutput(";TYPE:" + hint + "\n");
+                        writeOutputLine(";TYPE:" + hint);
                         oldHint = hint;
                     }
 
@@ -303,21 +304,21 @@ public abstract class Slicer {
                     if ((printMoveValid == true) && (outputCommand.length() > 2)){
                         // printf NEW "%s\n", $outputCommand;
                         // LOGGER.info("output : "+outputCommand);
-                        writeOutput(String.format("%s\n",outputCommand));
+                        writeOutputLine(String.format("%s",outputCommand));
                     }
                 }  else if (java.util.regex.Pattern.compile("^(;LAYER:0)").matcher(strLine).find()) {
                     // Output the layer count
-                    writeOutput(String.format(";Layer count: %d\n", layerCount));
-                    writeOutput(strLine + "\n");
+                    writeOutputLine(String.format(";Layer count: %d", layerCount));
+                    writeOutputLine(strLine);
                     // extrusionAfterRetraction = 0;
                 } else if (java.util.regex.Pattern.compile("^(;LAYER:)").matcher(strLine).find()) {
                     // Output the layer number
-                    writeOutput(strLine + "\n");
+                    writeOutputLine(strLine);
                     // $extrusionAfterRetraction = 0;
                 }  else {
                     // System.out.println(strLine);
                     // StandardCharsets.UTF_8.encode(strLine).array()
-                    writeOutput(strLine + "\n");
+                    writeOutputLine(strLine);
                 }
 
                 // Save the current position
@@ -340,6 +341,10 @@ public abstract class Slicer {
     protected void writeOutput(String textToWrite) throws IOException {
         // LOGGER.info(textToWrite);
         output.write(StandardCharsets.UTF_8.encode(textToWrite).array());
+    }
+
+    protected void writeOutputLine(String textToWrite) throws IOException {
+        writeOutput(textToWrite + System.lineSeparator());
     }
 
     public abstract void invoke(File resultGCode) throws IOException, InterruptedException;

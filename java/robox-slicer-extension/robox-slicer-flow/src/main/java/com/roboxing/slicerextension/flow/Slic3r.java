@@ -39,7 +39,8 @@ public class Slic3r extends Slicer {
     @Override
     public void invoke(File resultGCode) throws IOException, InterruptedException {
         List<String> args = new ArrayList<>();
-        args.add("/Applications/Slic3r.app/Contents/MacOS/Slic3r");
+
+        args.add(OS.detect().getDefaultSlicerPath());
         args.add("--gui");
         args.add("-o");
         args.add(resultGCode.getAbsolutePath());
@@ -56,6 +57,7 @@ public class Slic3r extends Slicer {
         process.waitFor();
     }
 
+    @Override
     public void postProcess(File inputGCode, File resultGCode) throws IOException {
 
         super.postProcess(inputGCode,resultGCode);
