@@ -8,7 +8,12 @@ These instructions will allow you to run Slic3r from within AutoMaker.
 
 ### Prerequisites
 
-You must be using Mac OS X, have a copy of AutoMaker, and a copy of [Slic3r](https://github.com/prusa3d/Slic3r/releases).
+Mac OS X:
+You must have a copy of AutoMaker, and a copy of [Slic3r](https://github.com/prusa3d/Slic3r/releases).
+
+Windows (experimental):
+You must have a copy of AutoMaker, and a copy of [Slic3r](https://github.com/prusa3d/Slic3r/releases).  Slic3r must be installed at "C:\Program Files\Slic3r".
+
 
 You must also note that __using this software may void your Robox warranty.__
 
@@ -81,7 +86,7 @@ You can see the process here:
 
 ### Caveats
 
-This code should be considered beta code, it has been tested a bit, but not exhaustively.  Use at your own risk.
+This code should be considered beta code, it has been tested a fair bit on Mac OS X, but the Windows port is extremely experimental, and may not work.  Use at your own risk.
 
 
 ### Compiling from source
@@ -104,7 +109,8 @@ The bottom one is 'executable' jar. In IDE's you don't need any of it. Just impo
 
 ### Known issues
 
-* Windows and Linux compatibility is not yet completed.
+* Linux compatibility is not yet completed.
+* Windows compatibility is experimental.
 
 ### Authors
 
