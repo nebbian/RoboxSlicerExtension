@@ -11,6 +11,4 @@ Compiling the robox slicer wrapper
 
 To compile this file, install Mingw, then run the following command:
 
-gcc robox_slicer_wrapper.c -o CuraEngine.exe
-
-
+gcc -static -static-libgcc robox_slicer_wrapper.c -o CuraEngine.exe
