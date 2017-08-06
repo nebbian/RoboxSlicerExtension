@@ -20,12 +20,16 @@ You must also note that __using this software may void your Robox warranty.__
 
 ### Installing
 
-
+#### Mac OS X
 Download [robox-extensions-installer.jar](robox-extensions-installer.jar) and run it with
 ```
 java -jar robox-extensions-installer.jar
 ```
-and it will do these steps for you:
+#### Windows
+Download this repository, and double click "Robox-Windows launch Installer here.cmd".
+
+#### All OS's
+The instructions above will do these steps for you:
 - copy CuraEngine to CuraEngine_orig (if not already exist)
 - download CuraEngine and slic3r_postprocess.pl to the right paths
 - and download Robox_slic3r_config_bundle.ini to <AM Install Dir>/Slic3r/Config for your convenience
@@ -38,29 +42,6 @@ You should now see that you have some new presets for Print Settings, Filament S
 
 Now close slic3r.  It will reopen when you try to print something in Automaker.
 
-
-
-### Old Installation Method
-* Download and unzip this repository.
-
-* Rename the CuraEngine within the Common/Cura directory to CuraEngine_exe
-```
-mv /Applications/CEL/Common/Cura/CuraEngine /Applications/CEL/Common/Cura/CuraEngine_exe
-```
-
-* Copy the files in shell scripts to /Applications/CEL/Common/Cura/
-
-```
-cp shell\ scripts/CuraEngine /Applications/CEL/Common/Cura/
-cp shell\ scripts/slic3r_postprocess.pl /Applications/CEL/Common/Cura/
-```
-
-* Open Slic3r, and choose "Load Config Bundle..." from the File menu.
-* Choose "Robox_slic3r_config_bundle.ini" from the slic3r/config directory.
-
-You should now see that you have some new presets for Print Settings, Filament Settings, and Printer Settings, all of which have "Robox" in the name. 
-
-* Close slic3r
 
 
 
