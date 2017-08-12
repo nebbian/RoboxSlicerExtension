@@ -36,13 +36,13 @@ public enum OS {
             "~",
             System.getProperty("user.home") + File.separator + "CEL Robox",
             "CuraEngine", "CuraEngine_orig",
-            "/Applications/Slic3r.app/Contents/MacOS/Slic3r"),
+            ""),
     OSX(
             "OSX",
             "/Applications/CEL",
             System.getProperty("user.home") + File.separator + "CEL Robox",
             "Common/Cura/CuraEngine", "Common/Cura/CuraEngine_orig",
-            ""),
+            "/Applications/Slic3r.app/Contents/MacOS/Slic3r"),
     UNKNOWN("Unknown", "", "", "", "", "");
 
     private String label;
