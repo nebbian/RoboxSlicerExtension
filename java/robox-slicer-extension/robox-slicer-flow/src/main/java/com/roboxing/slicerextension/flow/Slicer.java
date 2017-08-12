@@ -315,6 +315,9 @@ public abstract class Slicer {
                     // Output the layer number
                     writeOutputLine(strLine);
                     // $extrusionAfterRetraction = 0;
+                } else if ((m = java.util.regex.Pattern.compile("^(T(\\d+))").matcher(strLine)).find()) {
+                    // Change extruder
+                    writeOutputLine(String.format("T%s", m.group(2)));
                 }  else {
                     // System.out.println(strLine);
                     // StandardCharsets.UTF_8.encode(strLine).array()
