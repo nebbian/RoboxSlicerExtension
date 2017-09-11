@@ -198,7 +198,8 @@ public abstract class Slicer {
                     // Remove use absolute distances for extrusion
                 } else if (java.util.regex.Pattern.compile("^(G28\\s)").matcher(strLine).find()) {
                     // Remove home
-                } else if (java.util.regex.Pattern.compile("^(G1\\s+)").matcher(strLine).find()) {
+                } else if (	(java.util.regex.Pattern.compile("^(G1\\s+)").matcher(strLine).find()) ||
+                 			(java.util.regex.Pattern.compile("^(G0\\s+)").matcher(strLine).find())){
                     String outputCommand="";
                     printMoveValid = true;
                     
