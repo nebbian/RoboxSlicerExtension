@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -105,6 +106,8 @@ public abstract class Slicer {
             slicerResultWithRelativeE = new File(resultGCode.getParentFile(), resultGCode.getName().replace(".gcode", ".slicer.relative.gcode"));
             PrintWriter outputRelative = new PrintWriter(slicerResultWithRelativeE);
 
+            DecimalFormat extrusionFormat = new DecimalFormat("###0.00000");
+
             double previousExtrusion = 0.0;
             double currentExtrusion;
             double newExtrusion;
@@ -121,7 +124,7 @@ public abstract class Slicer {
                         // System.out.println("Line : " + strLine + ", E : " + currentExtrusion + ", ENew :" + newExtrusion + ", EReplace : " + m.group(0));
                         // System.out.println("m.group(0) :" + m.group(0));
                         // String newLine = strLine.replace(m.group(0), String.format(Locale.ROOT, "E%.5g%n", newExtrusion));
-                        String newLine = strLine.replace(m.group(0), "E"+(double)Math.round(newExtrusion * 100000d) / 100000d);
+                        String newLine = strLine.replace(m.group(0), "E"+extrusionFormat.format((double)Math.round(newExtrusion * 100000d) / 100000d));
                         // System.out.println("new Line :" + newLine);
                         outputRelative.println(newLine);
                     } else {
