@@ -1,2 +1,2 @@
-*.iml
-java/robox-slicer-extension/.idea
+.DS_Store
+dependency-reduced-pom.xml
