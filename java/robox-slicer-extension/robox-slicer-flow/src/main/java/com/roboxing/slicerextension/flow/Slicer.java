@@ -22,6 +22,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -352,6 +354,31 @@ public abstract class Slicer {
 
     protected void writeOutputLine(String textToWrite) throws IOException {
         writeOutput(textToWrite + System.lineSeparator());
+    }
+
+    protected void lookForNewGcodeFileToProcess(File inputGCode, File resultGCode){
+
+        Path currentDir = Paths.get(".").toAbsolutePath().normalize();
+        if (!currentDir.toString().contains("PrintJobs")) {
+            //if not in printJob Dir abort operation
+            return;
+        }
+
+        File dir = new File(currentDir.toString());
+
+        // Look inside current folder
+        for (File file : dir.listFiles()) {
+            String fileName = file.getName();
+            //System.out.println("File : " + fileName);
+            LOGGER.finer("File : " + fileName);
+            if(fileName.endsWith("-0.gcode")){
+                if(inputGCode.exists()){
+                    inputGCode.delete();
+                }
+                file.renameTo(inputGCode);
+                break;
+            }
+        }
     }
 
     public abstract void invoke(File resultGCode) throws IOException, InterruptedException;
