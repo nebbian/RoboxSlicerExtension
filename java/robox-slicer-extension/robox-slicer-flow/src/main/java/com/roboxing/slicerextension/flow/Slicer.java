@@ -22,8 +22,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.util.Scanner;
 import java.util.logging.Logger;
@@ -87,7 +85,7 @@ public abstract class Slicer {
                     // System.out.println(strLine);
                 }
                 if (!isAbsoluteExtrusion) {
-                    //Matcher mExtrusion = patternExtrusion.matcher(strLine);
+                    // Matcher mExtrusion = patternExtrusion.matcher(strLine);
                     if (patternAbsolute.matcher(strLine).find()) {
                         isAbsoluteExtrusion = true;
                     }
@@ -126,7 +124,7 @@ public abstract class Slicer {
                         // System.out.println("Line : " + strLine + ", E : " + currentExtrusion + ", ENew :" + newExtrusion + ", EReplace : " + m.group(0));
                         // System.out.println("m.group(0) :" + m.group(0));
                         // String newLine = strLine.replace(m.group(0), String.format(Locale.ROOT, "E%.5g%n", newExtrusion));
-                        String newLine = strLine.replace(m.group(0), "E"+extrusionFormat.format((double)Math.round(newExtrusion * 100000d) / 100000d));
+                        String newLine = strLine.replace(m.group(0), "E"+extrusionFormat.format(Math.round(newExtrusion * 100000d) / 100000d));
                         // System.out.println("new Line :" + newLine);
                         outputRelative.println(newLine);
                     } else {
@@ -148,8 +146,8 @@ public abstract class Slicer {
             this.output = output;
             output.setLength(0);
 
-            double minExtrusionLength = 0;  // Minimum extrusion length before we will allow a retraction
-            double minTravelDistance = 0.01;  // Minimum distance of travel before we actually take the command seriously
+            // double minExtrusionLength = 0;  // Minimum extrusion length before we will allow a retraction
+            // double minTravelDistance = 0.01;  // Minimum distance of travel before we actually take the command seriously
             double minPrintDistance = 0.01;  // Minimum distance of printing before we send the command to the postprocessor
 
             String oldHint = "";
@@ -162,7 +160,10 @@ public abstract class Slicer {
             int currentSpeed = 0;
             int lastMoveWasTravel = 0;
             int lastMoveWasRetract = 0;
-            double totalExtrusion=0;
+
+            @SuppressWarnings("unused") // TODO do we need it or we can remove it?
+            double totalExtrusion = 0;
+
             boolean extruding = false;
             boolean printMoveValid = false;
 
@@ -207,7 +208,7 @@ public abstract class Slicer {
                  			(java.util.regex.Pattern.compile("^(G0\\s+)").matcher(strLine).find())){
                     String outputCommand="";
                     printMoveValid = true;
-                    
+
                     // System.out.println("G1---:"+strLine);
                     // Grab all possible commands
                     m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s?)").matcher(strLine);
@@ -280,7 +281,7 @@ public abstract class Slicer {
                     }
 
                     extruding = false;
-                    
+
                     if (!commandE.equals("false")){
                         // Find retract/unretract
                         if (commandX.equals("false") && commandY.equals("false")){
@@ -298,14 +299,13 @@ public abstract class Slicer {
                             extruding = true;
                         }
                         totalExtrusion += Double.parseDouble(commandE);
-
                     }
 
-					// Don't output printing moves with zero movement
-					if((extruding == true) && (commandDistance < minPrintDistance)){
-						printMoveValid = false;
-					}
-					
+                    // Don't output printing moves with zero movement
+                    if ((extruding == true) && (commandDistance < minPrintDistance)) {
+                        printMoveValid = false;
+                    }
+
                     // Send the command to the file
                     if ((printMoveValid == true) && (outputCommand.length() > 2)){
                         // printf NEW "%s\n", $outputCommand;
@@ -354,31 +354,6 @@ public abstract class Slicer {
 
     protected void writeOutputLine(String textToWrite) throws IOException {
         writeOutput(textToWrite + System.lineSeparator());
-    }
-
-    protected void lookForNewGcodeFileToProcess(File inputGCode, File resultGCode){
-
-        Path currentDir = Paths.get(".").toAbsolutePath().normalize();
-        if (!currentDir.toString().contains("PrintJobs")) {
-            //if not in printJob Dir abort operation
-            return;
-        }
-
-        File dir = new File(currentDir.toString());
-
-        // Look inside current folder
-        for (File file : dir.listFiles()) {
-            String fileName = file.getName();
-            //System.out.println("File : " + fileName);
-            LOGGER.finer("File : " + fileName);
-            if(fileName.endsWith("-0.gcode")){
-                if(inputGCode.exists()){
-                    inputGCode.delete();
-                }
-                file.renameTo(inputGCode);
-                break;
-            }
-        }
     }
 
     public abstract void invoke(File resultGCode) throws IOException, InterruptedException;
