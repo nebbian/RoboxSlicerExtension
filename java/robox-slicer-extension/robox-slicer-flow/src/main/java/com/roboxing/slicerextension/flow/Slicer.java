@@ -25,6 +25,7 @@ import java.io.PrintWriter;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -359,4 +360,10 @@ public abstract class Slicer {
     }
 
     public abstract void invoke(File resultGCode) throws IOException, InterruptedException;
+
+    public File chooseOneFile(List<File> foundFiles) {
+        // By default we just pick first!
+        // TODO is it right?
+        return foundFiles.get(0);
+    }
 }

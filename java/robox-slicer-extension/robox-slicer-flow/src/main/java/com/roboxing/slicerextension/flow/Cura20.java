@@ -116,5 +116,16 @@ public class Cura20 extends Slicer {
             }
         }
     }
+
+    @Override
+    public File chooseOneFile(List<File> foundFiles) {
+        // For Cura we'll search first for file named '*-0.gcode' as save dialog defaults to it
+        for (File f : foundFiles) {
+            if (f.getName().endsWith("-0.gcode")) {
+                return f;
+            }
+        }
+        return super.chooseOneFile(foundFiles);
+    }
 }
 

@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Logger;
 
 import org.json.JSONObject;
@@ -69,19 +71,66 @@ public class Controller {
         JSONObject slicerConfig = JSONConfiguration.getJSONObject(configuration, "slicer" + slicerName).orElse(new JSONObject());
 
         // Instantiate slicer!
-        Slicer slicer = toSlicer(slicerName, slicerConfig);
+        Slicer selectedSlicer = toSlicer(slicerName, slicerConfig);
 
-        slicer.setArguments(arguments);
+        selectedSlicer.setArguments(arguments);
 
         File slicerResultingGCode = new File(arguments.getOutputFile().getParentFile(), arguments.getOutputFile().getName().replace(".gcode", ".slicer.gcode"));
 
-        LOGGER.fine("Invoking " + slicerName);
-        slicer.invoke(slicerResultingGCode);
+        long timeBeforeSlicing = System.currentTimeMillis();
 
+        // Do we really need this?
+        //        LOGGER.fine("Setting time to stl files...");
+        //        touchSTLFiles(currentDir, timeBeforeSlicing);
+        //        LOGGER.fine("Finished setting time.");
+
+        LOGGER.fine("Invoking " + slicerName);
+        selectedSlicer.invoke(slicerResultingGCode);
         LOGGER.fine("Finished slicing with " + slicerName);
 
-        LOGGER.fine("Invoking post processing " + slicerName);
-        slicer.postProcess(slicerResultingGCode, arguments.getOutputFile());
+        if (!slicerResultingGCode.exists()) {
+            LOGGER.warning("Cannot find resulting gcode file named " + slicerResultingGCode.getName());
+            LOGGER.fine("Searching for gcode...");
+            findGCodeFile(selectedSlicer, currentDir, slicerResultingGCode, timeBeforeSlicing);
+            LOGGER.info("Found another later gcode file named " + slicerResultingGCode.getName());
+        }
+
+        LOGGER.fine("Invoking post processing " + slicerName + "...");
+        selectedSlicer.postProcess(slicerResultingGCode, arguments.getOutputFile());
         LOGGER.fine("Finished post processing " + slicerName);
+    }
+
+    private void touchSTLFiles(Path currentDir, long now) {
+        File currentDirFile = currentDir.toFile();
+        for (File f : currentDirFile.listFiles()) {
+            if (f.getName().endsWith(".stl") || f.getName().endsWith(".obj")) {
+                f.setLastModified(now);
+            }
+        }
+    }
+
+    private void findGCodeFile(Slicer selectedSlicer, Path currentDir, File slicerResultingGCode, long timeBeforeSlicing) {
+        List<File> foundFiles = new ArrayList<>();
+        File currentDirFile = currentDir.toFile();
+        for (File f : currentDirFile.listFiles()) {
+            if (f.getName().endsWith(".gcode") && f.lastModified() >= timeBeforeSlicing) {
+                foundFiles.add(f);
+            }
+        }
+
+        File foundFile = null;
+
+        if (foundFiles.size() == 0) {
+            // what now?!
+            LOGGER.severe("Cannot gcode file, aborting.");
+            System.exit(15); // TODO enumerate all exit codes somewhere!!!
+        }
+        if (foundFiles.size() > 0) {
+            foundFile = selectedSlicer.chooseOneFile(foundFiles);
+        } else {
+            foundFile = foundFiles.get(0);
+        }
+
+        foundFile.renameTo(slicerResultingGCode);
     }
 }
