@@ -27,7 +27,6 @@ import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Scanner;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,7 +38,7 @@ import org.json.JSONObject;
  */
 public abstract class Slicer {
 
-    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+    // private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     private String name;
     private Arguments args;
@@ -105,41 +104,43 @@ public abstract class Slicer {
         }
 
         if (isAbsoluteExtrusion) {
-            Scanner scExtrusion = new Scanner(inputGCode, "UTF-8");
-            slicerResultWithRelativeE = new File(resultGCode.getParentFile(), resultGCode.getName().replace(".gcode", ".slicer.relative.gcode"));
-            PrintWriter outputRelative = new PrintWriter(slicerResultWithRelativeE);
+            try (Scanner scExtrusion = new Scanner(inputGCode, "UTF-8")) {
+                slicerResultWithRelativeE = new File(resultGCode.getParentFile(), resultGCode.getName().replace(".gcode", ".slicer.relative.gcode"));
+                try (PrintWriter outputRelative = new PrintWriter(slicerResultWithRelativeE)) {
 
-            DecimalFormat extrusionFormat = new DecimalFormat("###0.00000");
+                    DecimalFormat extrusionFormat = new DecimalFormat("###0.00000");
 
-            double previousExtrusion = 0.0;
-            double currentExtrusion;
-            double newExtrusion;
-            // DecimalFormat df = new DecimalFormat("#.#####");
-            Matcher m;
-            while (scExtrusion.hasNextLine()) {
-                String strLine = scExtrusion.nextLine();
-                m = patternExtrusion.matcher(strLine);
-                if (m.find()) {
+                    double previousExtrusion = 0.0;
+                    double currentExtrusion;
+                    double newExtrusion;
+                    // DecimalFormat df = new DecimalFormat("#.#####");
+                    Matcher m;
+                    while (scExtrusion.hasNextLine()) {
+                        String strLine = scExtrusion.nextLine();
+                        m = patternExtrusion.matcher(strLine);
+                        if (m.find()) {
 
-                    currentExtrusion = Double.parseDouble(m.group(2));
-                    if (currentExtrusion>0) {
-                        newExtrusion = currentExtrusion - previousExtrusion;
-                        // System.out.println("Line : " + strLine + ", E : " + currentExtrusion + ", ENew :" + newExtrusion + ", EReplace : " + m.group(0));
-                        // System.out.println("m.group(0) :" + m.group(0));
-                        // String newLine = strLine.replace(m.group(0), String.format(Locale.ROOT, "E%.5g%n", newExtrusion));
-                        String newLine = strLine.replace(m.group(0), "E"+extrusionFormat.format(Math.round(newExtrusion * 100000d) / 100000d));
-                        // System.out.println("new Line :" + newLine);
-                        outputRelative.println(newLine);
-                    } else {
-                        outputRelative.println(strLine);
+                            currentExtrusion = Double.parseDouble(m.group(2));
+                            if (currentExtrusion>0) {
+                                newExtrusion = currentExtrusion - previousExtrusion;
+                                // System.out.println("Line : " + strLine + ", E : " + currentExtrusion + ", ENew :" + newExtrusion + ", EReplace : " + m.group(0));
+                                // System.out.println("m.group(0) :" + m.group(0));
+                                // String newLine = strLine.replace(m.group(0), String.format(Locale.ROOT, "E%.5g%n", newExtrusion));
+                                String newLine = strLine.replace(m.group(0), "E"+extrusionFormat.format(Math.round(newExtrusion * 100000d) / 100000d));
+                                // System.out.println("new Line :" + newLine);
+                                outputRelative.println(newLine);
+                            } else {
+                                outputRelative.println(strLine);
+                            }
+                            previousExtrusion = currentExtrusion;
+                        } else {
+                            outputRelative.println(strLine);
+                        }
                     }
-                    previousExtrusion = currentExtrusion;
-                } else {
-                    outputRelative.println(strLine);
+                    // if extrusion was absolute use the relative E converted file as input
+                    inputGCode = slicerResultWithRelativeE;
                 }
             }
-            // if extrusion was absolute use the relative E converted file as input
-            inputGCode = slicerResultWithRelativeE;
         }
 
         // reset scanner
