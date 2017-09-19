@@ -60,7 +60,7 @@ public class Slic3r extends Slicer {
     @Override
     public void postProcess(File inputGCode, File resultGCode) throws IOException {
 
-        super.postProcess(inputGCode,resultGCode);
+        super.postProcess(inputGCode, resultGCode);
         System.out.println("total layers : " + layerCount);
 
     }

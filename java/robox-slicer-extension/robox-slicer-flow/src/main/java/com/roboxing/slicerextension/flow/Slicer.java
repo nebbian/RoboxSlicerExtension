@@ -292,12 +292,12 @@ public abstract class Slicer {
                             // Print extrusion if not straight after the first layer change
                             // if (totalExtrusion > 0) {
                                 // $outputCommand .= sprintf " E%s", $commandE;
-                                outputCommand += String.format(" E%s",commandE);
+                                outputCommand += String.format(" E%s", commandE);
                             // }
                         } else {
                             // Normal print move
                             // $outputCommand .= sprintf " E%s", $commandE;
-                            outputCommand += String.format(" E%s",commandE);
+                            outputCommand += String.format(" E%s", commandE);
                             extruding = true;
                         }
                         totalExtrusion += Double.parseDouble(commandE);
@@ -312,7 +312,7 @@ public abstract class Slicer {
                     if ((printMoveValid == true) && (outputCommand.length() > 2)) {
                         // printf NEW "%s\n", $outputCommand;
                         // LOGGER.info("output : "+outputCommand);
-                        writeOutputLine(String.format("%s",outputCommand));
+                        writeOutputLine(String.format("%s", outputCommand));
                     }
                 }  else if (compile("^(;LAYER:0)").matcher(strLine).find()) {
                     // Output the layer count

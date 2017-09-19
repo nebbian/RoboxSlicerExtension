@@ -70,7 +70,7 @@ public class Main {
             System.exit(0);
         } catch (Exception e) {
             Logger LOGGER = Logger.getLogger(Main.class.getName());
-            LOGGER.log(Level.SEVERE,"Error processing : ",e);
+            LOGGER.log(Level.SEVERE, "Error processing : ", e);
             System.exit(1);
         }
     }

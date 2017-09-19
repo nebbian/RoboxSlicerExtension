@@ -89,7 +89,7 @@ public class Cura20 extends Slicer {
         // look for file in the printJob directory
         lookForNewGcodeFileToProcess(inputGCode);
         // isAbsoluteExtrusion = true;
-        super.postProcess(inputGCode,resultGCode);
+        super.postProcess(inputGCode, resultGCode);
         System.out.println("total layers : " + layerCount);
     }
 

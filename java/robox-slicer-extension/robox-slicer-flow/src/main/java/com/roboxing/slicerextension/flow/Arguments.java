@@ -140,7 +140,7 @@ public class Arguments {
 //                    if (file.getName().endsWith(".orig")) {
 //                        File gcodeFile = new File(file.getAbsolutePath().replace(".orig", ""));
 //                        gcodeFile.delete();
-//                        file.renameTo(new File(file.getAbsolutePath().replace(".orig","")));
+//                        file.renameTo(new File(file.getAbsolutePath().replace(".orig", "")));
 //                        break;
 //                    }
 //                }

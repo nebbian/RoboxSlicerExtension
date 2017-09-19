@@ -73,7 +73,7 @@ public class Controller {
 
         slicer.setArguments(arguments);
 
-        File slicerResultingGCode = new File(arguments.getOutputFile().getParentFile(), arguments.getOutputFile().getName().replace(".gcode",".slicer.gcode"));
+        File slicerResultingGCode = new File(arguments.getOutputFile().getParentFile(), arguments.getOutputFile().getName().replace(".gcode", ".slicer.gcode"));
 
         LOGGER.fine("Invoking " + slicerName);
         slicer.invoke(slicerResultingGCode);
