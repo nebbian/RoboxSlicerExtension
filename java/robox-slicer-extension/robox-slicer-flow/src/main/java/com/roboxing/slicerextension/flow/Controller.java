@@ -100,14 +100,14 @@ public class Controller {
         LOGGER.fine("Finished post processing " + slicerName);
     }
 
-    private void touchSTLFiles(Path currentDir, long now) {
-        File currentDirFile = currentDir.toFile();
-        for (File f : currentDirFile.listFiles()) {
-            if (f.getName().endsWith(".stl") || f.getName().endsWith(".obj")) {
-                f.setLastModified(now);
-            }
-        }
-    }
+    //    private void touchSTLFiles(Path currentDir, long now) {
+    //        File currentDirFile = currentDir.toFile();
+    //        for (File f : currentDirFile.listFiles()) {
+    //            if (f.getName().endsWith(".stl") || f.getName().endsWith(".obj")) {
+    //                f.setLastModified(now);
+    //            }
+    //        }
+    //    }
 
     private void findGCodeFile(Slicer selectedSlicer, Path currentDir, File slicerResultingGCode, long timeBeforeSlicing) {
         List<File> foundFiles = new ArrayList<>();

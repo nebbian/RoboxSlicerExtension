@@ -21,8 +21,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -86,35 +84,9 @@ public class Cura20 extends Slicer {
 
     @Override
     public void postProcess(File inputGCode, File resultGCode) throws IOException {
-        // look for file in the printJob directory
-        lookForNewGcodeFileToProcess(inputGCode);
         // isAbsoluteExtrusion = true;
         super.postProcess(inputGCode, resultGCode);
         System.out.println("total layers : " + layerCount);
-    }
-
-    private void lookForNewGcodeFileToProcess(File inputGCode) {
-        Path currentDir = Paths.get(".").toAbsolutePath().normalize();
-        if (!currentDir.toString().contains("PrintJobs")) {
-            // If not in printJob dir abort operation
-            return;
-        }
-
-        File dir = new File(currentDir.toString());
-
-        // Look inside current folder
-        for (File file : dir.listFiles()) {
-            String fileName = file.getName();
-            // System.out.println("File : " + fileName);
-            LOGGER.finer("File : " + fileName);
-            if (fileName.endsWith("-0.gcode")) {
-                if (inputGCode.exists()) {
-                    inputGCode.delete();
-                }
-                file.renameTo(inputGCode);
-                return;
-            }
-        }
     }
 
     @Override
