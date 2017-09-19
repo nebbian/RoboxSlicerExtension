@@ -2,6 +2,8 @@ package com.roboxing.slicerextension.flow;
 
 import java.io.IOException;
 
+import com.roboxing.slicerextension.flow.annotations.Pattern;
+
 public class Slic3rPostProcessor extends AbstractPostProcessor {
 
     double minExtrusionLength = 0.3;  // Minimum extrusion length before we will allow a retraction

@@ -17,6 +17,8 @@
 */
 package com.roboxing.slicerextension.flow;
 
+import static java.util.regex.Pattern.compile;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -71,11 +73,11 @@ public abstract class Slicer {
     public void postProcess(File inputGCode, File resultGCode) throws IOException{
 
         // isAbsoluteExtrusion = false;
-        java.util.regex.Pattern patternAbsolute = java.util.regex.Pattern.compile("^(M82\\s)");
-        java.util.regex.Pattern patternExtrusion = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s?)");
+        Pattern patternAbsolute = compile("^(M82\\s)");
+        Pattern patternExtrusion = compile("(E([\\-0-9\\.]+)\\s?)");
 
         layerCount = 0;
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("^(;LAYER:)");
+        Pattern pattern = compile("^(;LAYER:)");
 
         try (Scanner sc = new Scanner(inputGCode, "UTF-8")) {
             while (sc.hasNextLine()) {
@@ -179,54 +181,54 @@ public abstract class Slicer {
             while (sc.hasNextLine()) {
                 String strLine = sc.nextLine();
                 Matcher m;
-                if ((m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s+Y([\\-0-9\\.]+))").matcher(strLine)).find()) {
+                if ((m = compile("(X([\\-0-9\\.]+)\\s+Y([\\-0-9\\.]+))").matcher(strLine)).find()) {
                     double newX = Double.parseDouble(m.group(2));
                     double newY = Double.parseDouble(m.group(3));
 
                     commandDistance = Math.sqrt(Math.pow(newX - currentX, 2) + Math.pow(newY - currentY, 2));
                 }
-                if ((m = java.util.regex.Pattern.compile("^(M204\\s+S(\\d+))").matcher(strLine)).find()) {
+                if ((m = compile("^(M204\\s+S(\\d+))").matcher(strLine)).find()) {
                     // printf NEW "M201 X%d Y%d Z%d E2000\n", $2, $2, $2;
                     writeOutputLine(String.format("M201 X%d Y%d Z%d E2000", m.group(2), m.group(2), m.group(2)));
-                } else if (java.util.regex.Pattern.compile("^(M190\\s)").matcher(strLine).find()) {
+                } else if (compile("^(M190\\s)").matcher(strLine).find()) {
                     // Remove bed temperature settings
-                } else if (java.util.regex.Pattern.compile("^(M104\\s)").matcher(strLine).find()) {
+                } else if (compile("^(M104\\s)").matcher(strLine).find()) {
                     // Remove nozzle temperature settings
-                } else if (java.util.regex.Pattern.compile("^(M109\\s)").matcher(strLine).find()) {
+                } else if (compile("^(M109\\s)").matcher(strLine).find()) {
                     // Remove set temperature and wait
-                } else if (java.util.regex.Pattern.compile("^(G21\\s)").matcher(strLine).find()) {
+                } else if (compile("^(G21\\s)").matcher(strLine).find()) {
                     // Remove set units to mm
-                } else if (java.util.regex.Pattern.compile("^(G90\\s)").matcher(strLine).find()) {
+                } else if (compile("^(G90\\s)").matcher(strLine).find()) {
                     // Remove use absolute coordinates
-                } else if (java.util.regex.Pattern.compile("^(M83\\s)").matcher(strLine).find()) {
+                } else if (compile("^(M83\\s)").matcher(strLine).find()) {
                     // Remove use relative distances for extrusion
-                } else if (java.util.regex.Pattern.compile("^(M82\\s)").matcher(strLine).find()) {
+                } else if (compile("^(M82\\s)").matcher(strLine).find()) {
                     // Remove use absolute distances for extrusion
-                } else if (java.util.regex.Pattern.compile("^(G28\\s)").matcher(strLine).find()) {
+                } else if (compile("^(G28\\s)").matcher(strLine).find()) {
                     // Remove home
-                } else if ((java.util.regex.Pattern.compile("^(G1\\s+)").matcher(strLine).find()) ||
-                             (java.util.regex.Pattern.compile("^(G0\\s+)").matcher(strLine).find())) {
+                } else if ((compile("^(G1\\s+)").matcher(strLine).find()) ||
+                             (compile("^(G0\\s+)").matcher(strLine).find())) {
                     String outputCommand="";
                     printMoveValid = true;
 
                     // System.out.println("G1---:"+strLine);
                     // Grab all possible commands
-                    m = java.util.regex.Pattern.compile("(X([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = compile("(X([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandX = m.group(2); } else { commandX = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(Y([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = compile("(Y([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandY = m.group(2); } else { commandY = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(Z([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = compile("(Z([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandZ = m.group(2); } else { commandZ = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(E([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = compile("(E([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandE = m.group(2);} else { commandE = "false"; }
 
-                    m = java.util.regex.Pattern.compile("(F([\\-0-9\\.]+)\\s?)").matcher(strLine);
+                    m = compile("(F([\\-0-9\\.]+)\\s?)").matcher(strLine);
                     if (m.find()) { commandSpeed = m.group(2); } else { commandSpeed = "false"; }
 
-                    m = java.util.regex.Pattern.compile(";\\s+(.+)$").matcher(strLine);
+                    m = compile(";\\s+(.+)$").matcher(strLine);
                     if (m.find()) { comment = m.group(1); } else { comment = "false"; }
 
                     // Output hints
@@ -312,16 +314,16 @@ public abstract class Slicer {
                         // LOGGER.info("output : "+outputCommand);
                         writeOutputLine(String.format("%s",outputCommand));
                     }
-                }  else if (java.util.regex.Pattern.compile("^(;LAYER:0)").matcher(strLine).find()) {
+                }  else if (compile("^(;LAYER:0)").matcher(strLine).find()) {
                     // Output the layer count
                     writeOutputLine(String.format(";Layer count: %d", layerCount));
                     writeOutputLine(strLine);
                     // extrusionAfterRetraction = 0;
-                } else if (java.util.regex.Pattern.compile("^(;LAYER:)").matcher(strLine).find()) {
+                } else if (compile("^(;LAYER:)").matcher(strLine).find()) {
                     // Output the layer number
                     writeOutputLine(strLine);
                     // $extrusionAfterRetraction = 0;
-                } else if ((m = java.util.regex.Pattern.compile("^(T(\\d+))").matcher(strLine)).find()) {
+                } else if ((m = compile("^(T(\\d+))").matcher(strLine)).find()) {
                     // Change extruder
                     writeOutputLine(String.format("T%s", m.group(2)));
                 }  else {

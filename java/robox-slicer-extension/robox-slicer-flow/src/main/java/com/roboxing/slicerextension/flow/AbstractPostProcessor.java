@@ -9,6 +9,8 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
+import com.roboxing.slicerextension.flow.annotations.Pattern;
+import com.roboxing.slicerextension.flow.annotations.Patterns;
 import com.roboxing.slicerextension.flow.utils.LineProcessor;
 import com.roboxing.slicerextension.flow.utils.LineProcessor.VarStringMethod;
 
