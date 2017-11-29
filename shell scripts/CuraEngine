@@ -1,6 +1,0 @@
-#!/bin/bash
-
-
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-$DIR/../../AutoMaker/java/bin/java -jar $DIR/../robox-slicer-flow-1.0-SNAPSHOT.jar "$@"
