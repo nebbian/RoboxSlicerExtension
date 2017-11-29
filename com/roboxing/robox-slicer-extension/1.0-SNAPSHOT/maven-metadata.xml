@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata modelVersion="1.1.0">
+  <groupId>com.roboxing</groupId>
+  <artifactId>robox-slicer-extension</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <versioning>
+    <snapshot>
+      <timestamp>20171129.170516</timestamp>
+      <buildNumber>1</buildNumber>
+    </snapshot>
+    <lastUpdated>20171129170516</lastUpdated>
+    <snapshotVersions>
+      <snapshotVersion>
+        <extension>pom</extension>
+        <value>1.0-20171129.170516-1</value>
+        <updated>20171129170516</updated>
+      </snapshotVersion>
+    </snapshotVersions>
+  </versioning>
+</metadata>
